@@ -1,16 +1,15 @@
 # abhishekash.github.io
 
-Personal site for **Abhishek Ash** — Senior Staff Engineer in Berlin, building open-source
-runtime, tracing, and evaluation tools for AI agents.
+Personal site for **Abhishek Ash** — Senior Staff Engineer in Berlin. Work, open source,
+life outside the terminal, and notes.
 
 Live at <https://abhishekash.github.io/>.
 
 ## Design
 
-A warm-paper editorial page with a single dark "trace record" as the visual anchor. The
-palette and monospace details carry over from the Agenturm field instrument: paper
-`#F2EEE4`, graphite `#1B1A15`, rust accent `#8A4A12`, amber `#FFBD69`, and lavender
-`#C5ADFF`.
+A warm-paper editorial page with one dark "index card" as the visual anchor. The palette
+carries over from the Agenturm field instrument: paper `#F2EEE4`, graphite `#1B1A15`, rust
+accent `#8A4A12`, amber `#FFBD69`, and lavender `#C5ADFF`.
 
 - One self-contained HTML file: inline CSS and JS, system fonts, data-URI favicon.
 - No web fonts, analytics, cookies, or third-party requests. The page itself is one file.
@@ -18,6 +17,10 @@ palette and monospace details carry over from the Agenturm field instrument: pap
 - Light and dark themes: follows `prefers-color-scheme`, with a manual toggle that
   persists in `localStorage`.
 - Responsive from 320px, keyboard accessible, reduced-motion aware, and printable.
+
+## Contact
+
+LinkedIn only. No email address is published in the markup, JSON-LD, or commit metadata.
 
 ## Structure
 
@@ -31,17 +34,20 @@ robots.txt   allow all
 
 ## Content sources
 
-All claims and links are taken from the public repositories and the GitHub profile README:
+All claims and links come from public work:
 
 - <https://github.com/abhishekash/agenturm>
 - <https://github.com/abhishekash/spanhound>
 - <https://github.com/abhishekash/agent-harness>
 - <https://github.com/abhishekash/agent-evals>
 - <https://github.com/abhishekash/agent-skills>
+- <https://github.com/abhishekash/trekFinder>
+- <https://github.com/abhishekash/trek-ai>
 - <https://github.com/abhishekash/abhishekash>
+- LinkedIn posts linked from the Notes section
 
-The 8/8 eval figure is labelled as a scripted mechanism baseline, not a live-model score.
-The hero trace is labelled as reconstructed, with synthetic identifiers.
+The site avoids metrics and superlatives. Any technical claim is either linked to a
+repository or stated as an opinion.
 
 ## Local preview
 
@@ -63,7 +69,8 @@ git push
 
 ## Edit points
 
-- Hero copy and trace panel: `.hero` in `index.html`.
-- Projects: the `.feature` article and `.cards` block.
-- Notes links: `.notes`.
-- Contact links: `.contact` and the JSON-LD block at the end of the file.
+- Hero copy and index card: `.hero` and `.snapshot` in `index.html`.
+- Current work and project list: `#work`.
+- Personal section: `#life`.
+- Notes links: `#notes`.
+- Contact: `#contact` and the JSON-LD block at the end of the file.
