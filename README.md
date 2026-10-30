@@ -7,18 +7,22 @@ Live at <https://abhishekash.github.io/>.
 
 ## Design
 
-A warm-paper editorial page with pencil mountain studies and one dark "index card" as the
-visual anchor. The palette: paper `#F2EEE4`, graphite `#1B1A15`, rust accent `#8A4A12`,
-amber `#FFBD69`, and lavender `#C5ADFF`.
+**Airbnb meets Figma.** The site uses Airbnb's clean, hospitable surface — white
+backgrounds, generous spacing, rounded cards, soft shadows, coral primary actions, and a
+mobile bottom navigation — with Figma's design-tool language: a dotted canvas, frame
+labels, purple selection handles, a cursor label, component-style chips, and a
+"Properties" inspector for the About section.
 
-- One self-contained HTML file per page: inline CSS and JS, system fonts, data-URI favicon.
-- No web fonts, analytics, cookies, or third-party requests. Pages are self-contained.
-- `og.png` and the blog social card are used only by link-preview crawlers.
-- Light and dark themes: follows `prefers-color-scheme`, with a manual toggle that
-  persists in `localStorage`.
-- The homepage includes two inline pencil studies: Goechala (Kanchenjunga from the pass)
-  and Annapurna (the massif with Machapuchare). They are decorative and labelled as such.
+- Palette: white `#FFFFFF`, ink `#222222`, muted `#6B6B6B`, coral `#E31C5F`, purple
+  `#6E4AFF`, with blue, green, and orange accents on the project tiles.
+- System sans typography, rounded 16–24px surfaces, pill buttons, and soft shadows.
+- The pencil Goechala and Annapurna studies remain, framed as rounded "art print" cards
+  in the Life section.
+- One self-contained HTML file per page: inline CSS and JS, system fonts, data-URI
+  favicon, no web fonts or third-party requests.
+- Light and dark themes follow `prefers-color-scheme`, with a persisted manual toggle.
 - Responsive from 320px, keyboard accessible, reduced-motion aware, and printable.
+- The mobile layout uses a fixed bottom tab bar with scroll-aware active states.
 
 ## Contact
 
