@@ -23,6 +23,7 @@ palette and monospace details carry over from the Agenturm field instrument: pap
 ```text
 index.html   the site (all content and styles)
 404.html     standalone not-found page
+og.png       1200×630 social preview card
 robots.txt   allow all
 .nojekyll    skip Jekyll processing on GitHub Pages
 ```
