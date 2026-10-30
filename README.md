@@ -13,7 +13,8 @@ palette and monospace details carry over from the Agenturm field instrument: pap
 `#C5ADFF`.
 
 - One self-contained HTML file: inline CSS and JS, system fonts, data-URI favicon.
-- No external assets, fonts, analytics, cookies, or third-party requests.
+- No web fonts, analytics, cookies, or third-party requests. The page itself is one file.
+- `og.png` is used only by link-preview crawlers, never loaded by the page.
 - Light and dark themes: follows `prefers-color-scheme`, with a manual toggle that
   persists in `localStorage`.
 - Responsive from 320px, keyboard accessible, reduced-motion aware, and printable.
