@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agents Don't Fail Loudly — Abhishek Ash</title>
+<meta name="description" content="A hypothetical refund reveals how to design agent recovery, idempotency, authorisation, and verification.">
+<link rel="canonical" href="https://abhishekash.github.io/blog/agents-dont-fail-loudly.html">
+<link rel="alternate" type="application/rss+xml" title="Abhishek Ash — Writing" href="https://abhishekash.github.io/blog/feed.xml">
+<meta name="theme-color" content="#F2EEE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14130F" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agents Don't Fail Loudly">
+<meta property="og:description" content="Designing for the gap between an action and what the agent knows about it.">
+<meta property="og:url" content="https://abhishekash.github.io/blog/agents-dont-fail-loudly.html">
+<meta property="og:image" content="https://abhishekash.github.io/blog/og-agents-dont-fail-loudly.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="article:published_time" content="2026-10-30">
+<meta property="article:author" content="Abhishek Ash">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agents Don't Fail Loudly">
+<meta name="twitter:description" content="Designing for the gap between an action and what the agent knows about it.">
+<meta name="twitter:image" content="https://abhishekash.github.io/blog/og-agents-dont-fail-loudly.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%2317150F'/%3E%3Ctext x='32' y='42' font-family='ui-monospace,monospace' font-size='23' font-weight='700' fill='%23FFBD69' text-anchor='middle'%3EAA%3C/text%3E%3C/svg%3E">
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) {}
+})();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #F2EEE4; --bg-2: #E9E4D7; --surface: #FAF7F0;
+    --ink: #1B1A15; --muted: #5B5A4F; --line: #D5CFC0; --line-strong: #B4AC99;
+    --accent: #8A4A12; --mark: #E3EC86;
+    --terminal-bg: #17150F; --terminal-ink: #F4EFE2; --terminal-muted: #A9A492; --terminal-line: #322E22;
+    --amber: #FFBD69; --lime: #E3EC86; --lavender: #C5ADFF;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #14130F; --bg-2: #1B1A15; --surface: #1E1C16;
+    --ink: #F1ECE0; --muted: #A6A294; --line: #322F27; --line-strong: #4C473A;
+    --accent: #FFBD69; --mark: rgba(197, 173, 255, .32);
+    --terminal-bg: #0E0D0A; --terminal-ink: #F4EFE2; --terminal-muted: #A29D8C; --terminal-line: #2C291F;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #14130F; --bg-2: #1B1A15; --surface: #1E1C16;
+      --ink: #F1ECE0; --muted: #A6A294; --line: #322F27; --line-strong: #4C473A;
+      --accent: #FFBD69; --mark: rgba(197, 173, 255, .32);
+      --terminal-bg: #0E0D0A; --terminal-ink: #F4EFE2; --terminal-muted: #A29D8C; --terminal-line: #2C291F;
+    }
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 84px; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; overflow-x: clip;
+    background: var(--bg); color: var(--ink);
+    font-family: var(--serif); font-size: 18.5px; line-height: 1.72;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+  :root[data-theme="dark"] body::after { opacity: .3; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body::after { opacity: .3; }
+  }
+  ::selection { background: var(--mark); color: #17150F; }
+  h1, h2, h3, p, ul, ol, figure, blockquote { margin: 0; }
+  a { color: inherit; }
+  svg { display: block; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+  .skip {
+    position: absolute; left: 16px; top: -60px; z-index: 120;
+    padding: 10px 16px; background: var(--ink); color: var(--bg);
+    font: 600 13px/1 var(--sans); text-decoration: none; border-radius: 3px;
+  }
+  .skip:focus { top: 12px; }
+
+  /* progress */
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 110; background: transparent; }
+  .progress span {
+    display: block; height: 100%; background: var(--accent);
+    transform: scaleX(0); transform-origin: 0 50%;
+    transition: transform .1s linear;
+  }
+
+  /* header */
+  .site-head { position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--line); background: var(--bg); }
+  @supports (backdrop-filter: blur(10px)) {
+    .site-head { background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(12px) saturate(1.2); }
+  }
+  .site-head__inner { display: flex; align-items: center; gap: 28px; height: 64px; width: min(1120px, 100% - 48px); margin-inline: auto; }
+  .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; margin-right: auto; }
+  .brand__mark {
+    display: grid; place-items: center; width: 30px; height: 30px;
+    border: 1px solid var(--ink); border-radius: 3px;
+    font: 600 10.5px/1 var(--mono); letter-spacing: .04em;
+  }
+  .brand:hover .brand__mark { background: var(--ink); color: var(--bg); }
+  .brand__name { font: 600 14.5px/1 var(--sans); letter-spacing: -.01em; }
+  .nav { display: flex; align-items: center; gap: 26px; }
+  .nav a { font: 500 13px/1 var(--sans); color: var(--muted); text-decoration: none; padding: 8px 0; }
+  .nav a:hover { color: var(--ink); }
+  .nav a[aria-current="page"] { color: var(--ink); }
+  .nav .nav__contact { color: var(--ink); }
+  .theme {
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0;
+    border: 1px solid var(--line-strong); border-radius: 3px; background: transparent;
+    color: var(--ink); cursor: pointer;
+  }
+  .theme:hover { border-color: var(--ink); background: var(--bg-2); }
+  .theme__sun { display: none; }
+  :root[data-theme="dark"] .theme__sun { display: block; }
+  :root[data-theme="dark"] .theme__moon { display: none; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme__sun { display: block; }
+    :root:not([data-theme="light"]) .theme__moon { display: none; }
+  }
+
+  /* shell */
+  .shell {
+    width: min(1080px, 100% - 48px);
+    margin: 0 auto;
+    padding: clamp(44px, 7vw, 84px) 0 clamp(56px, 8vw, 88px);
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+  .rail { position: sticky; top: 96px; font-family: var(--sans); }
+  .rail__label {
+    font: 500 10px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 14px;
+  }
+  .rail ol { list-style: none; margin: 0; padding: 0; border-left: 1px solid var(--line); }
+  .rail li { margin: 0; }
+  .rail a {
+    display: block; padding: 6px 0 6px 14px; margin-left: -1px;
+    border-left: 1px solid transparent;
+    font: 500 12px/1.4 var(--sans); color: var(--muted); text-decoration: none;
+  }
+  .rail a:hover, .rail a.is-active { color: var(--accent); border-left-color: var(--accent); }
+  .rail__back {
+    display: inline-block; margin-top: 28px;
+    font: 500 10px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase;
+    color: var(--muted); text-decoration: none;
+  }
+  .rail__back:hover { color: var(--accent); }
+
+  .article { max-width: 44rem; min-width: 0; }
+  .kicker {
+    display: flex; align-items: center; gap: 12px;
+    font: 500 10.5px/1 var(--mono); letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 20px;
+  }
+  .kicker::before { content: ""; width: 26px; height: 1px; background: var(--accent); flex: none; }
+  h1 {
+    font-family: var(--serif); font-weight: 400;
+    font-size: clamp(2.4rem, 5.2vw, 3.5rem);
+    line-height: 1.04; letter-spacing: -.028em; text-wrap: balance;
+    margin: 0 0 14px;
+  }
+  .subtitle {
+    font-family: var(--serif); font-style: italic;
+    font-size: 1.28rem; line-height: 1.5; color: var(--muted);
+    margin: 0 0 22px;
+  }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 6px 0;
+    font: 500 10px/1.5 var(--mono); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); padding-bottom: 20px; border-bottom: 1px solid var(--line);
+  }
+  .meta span + span::before { content: "·"; margin: 0 10px; color: var(--line-strong); }
+  .post-ridge { color: var(--ink); opacity: .28; margin: 14px 0 20px; }
+  .post-ridge svg { width: 100%; height: 48px; }
+
+  .article p { margin: 0 0 1.35rem; }
+  .lede { font-size: 1.13rem; line-height: 1.68; }
+  .article h2 {
+    font-family: var(--serif); font-weight: 600;
+    font-size: 1.6rem; line-height: 1.2; letter-spacing: -.012em;
+    margin: 3.2rem 0 1.05rem; scroll-margin-top: 92px;
+  }
+  .anchor { color: var(--line-strong); text-decoration: none; font-weight: 400; margin-left: .5rem; opacity: 0; }
+  .article h2:hover .anchor { opacity: 1; }
+  .article a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .article a:hover { text-decoration-thickness: 2px; }
+  .article strong { font-weight: 650; }
+  .article em { font-style: italic; }
+  .article code {
+    font-family: var(--mono); font-size: .84em;
+    background: var(--bg-2); padding: .1em .35em; border-radius: 3px;
+  }
+  .article ul { margin: 0 0 1.35rem; padding-left: 1.2rem; }
+  .article li { margin-bottom: .35rem; }
+  .article blockquote {
+    margin: 2rem 0; padding: .2rem 0 .2rem 1.4rem;
+    border-left: 2px solid var(--accent); color: var(--muted); font-style: italic;
+  }
+
+  /* figures */
+  .fig { margin: 2.7rem 0; }
+  .fig figcaption {
+    margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);
+    font: 400 12.5px/1.6 var(--sans); color: var(--muted);
+  }
+  .fig__num { font-weight: 600; color: var(--accent); margin-right: 3px; }
+  .fig--phone { display: flex; flex-direction: column; align-items: center; }
+  .fig__scroll { overflow-x: auto; scrollbar-width: thin; }
+  .fig__scroll:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 2px; }
+  .fig__hint {
+    display: none; margin-top: 8px;
+    font: 500 9px/1.4 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  }
+  .fig--phone figcaption { width: 100%; }
+
+  .phone {
+    width: min(300px, 100%);
+    padding: 9px; border-radius: 34px;
+    background: #17150F;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .16);
+  }
+  .phone__screen { border-radius: 26px; overflow: hidden; background: var(--bg); border: 1px solid rgba(255, 255, 255, .06); }
+  .phone__bar {
+    display: flex; justify-content: space-between;
+    padding: 9px 14px 7px; border-bottom: 1px solid var(--line);
+    font: 500 8.5px/1 var(--mono); color: var(--muted);
+  }
+  .phone__chat { padding: 12px 12px 16px; display: grid; gap: 8px; }
+  .bubble {
+    max-width: 86%; padding: 9px 11px; border-radius: 12px;
+    font: 400 12.5px/1.45 var(--sans);
+  }
+  .bubble--them { background: var(--bg-2); border-bottom-left-radius: 3px; }
+  .bubble--agent { background: var(--ink); color: var(--bg); margin-left: auto; border-bottom-right-radius: 3px; }
+  .phone__record {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 14px; border-top: 1px dashed var(--line);
+    font: 500 8.5px/1.3 var(--mono); color: var(--muted);
+  }
+  .badge {
+    padding: 3px 5px; border: 1px solid var(--accent); border-radius: 2px;
+    color: var(--accent); font-size: 8px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+  }
+
+  .diagram { width: 100%; height: auto; color: var(--ink); font-family: var(--sans); }
+  .diagram text { fill: var(--ink); font-size: 12px; font-family: var(--sans); }
+  .diagram .t-mono { font-family: var(--mono); font-size: 9px; letter-spacing: .08em; }
+  .diagram .t-muted { fill: var(--muted); }
+  .diagram .t-accent { fill: var(--accent); }
+  .diagram .t-strong { font-weight: 600; }
+  .diagram .box { fill: var(--surface); stroke: var(--line-strong); stroke-width: 1; }
+  .diagram .box--accent { stroke: var(--accent); }
+  .diagram .line { stroke: var(--ink); stroke-width: 1; fill: none; }
+  .diagram .muted { stroke: var(--muted); }
+  .diagram .accent { stroke: var(--accent); }
+  .diagram .dash { stroke-dasharray: 4 5; }
+  .diagram .arrowhead { fill: var(--ink); }
+
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1px;
+    border: 1px solid var(--line); border-radius: 6px; overflow: hidden;
+    background: var(--line);
+  }
+  .compare__col { background: var(--surface); padding: 22px; }
+  .compare__label { font: 500 10px/1.4 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .compare__keys { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 14px; }
+  .key {
+    font: 500 11px/1 var(--mono); padding: 6px 8px;
+    border: 1px solid var(--line-strong); border-radius: 3px; background: var(--bg);
+  }
+  .key--new { border-color: var(--accent); color: var(--accent); }
+  .compare__arrow { color: var(--muted); font-size: 12px; }
+  .compare__result { margin-top: 16px; font-family: var(--serif); font-size: 24px; line-height: 1.2; }
+  .compare__col--bad .compare__result { color: var(--accent); }
+  .compare__note { margin-top: 6px; font-size: 13px; color: var(--muted); }
+
+  .roles { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line-strong); }
+  .role { padding: 18px 20px 18px 0; }
+  .role + .role { border-left: 1px solid var(--line); padding-left: 20px; }
+  .role__label { font: 500 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+  .role p { margin: 10px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+
+  .ladder { list-style: none; border-top: 1px solid var(--line); }
+  .ladder li { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 18px; padding: 15px 0; border-bottom: 1px solid var(--line); }
+  .ladder__chip {
+    justify-self: start; font: 500 9.5px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--line-strong); border-radius: 2px; padding: 5px 6px; align-self: start; white-space: nowrap;
+  }
+  .ladder p { margin: 0; font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+  .ladder p + p { margin-top: 4px; }
+  .ladder strong { color: var(--ink); font-weight: 600; }
+
+  .colophon {
+    margin-top: 3.4rem; padding-top: 1.3rem; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px 24px;
+    font: 400 11px/1.6 var(--mono); color: var(--muted);
+  }
+  .colophon a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line-strong); padding-bottom: 1px; }
+  .colophon a:hover { color: var(--accent); border-color: var(--accent); }
+
+  .site-foot {
+    width: min(1080px, 100% - 48px); margin: 0 auto;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 10px 24px; padding: 30px 0 44px; border-top: 1px solid var(--line);
+    font: 400 11px/1.6 var(--mono); color: var(--muted);
+  }
+  .site-foot a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line-strong); padding-bottom: 1px; }
+  .site-foot a:hover { color: var(--accent); border-color: var(--accent); }
+
+  @media (max-width: 980px) {
+    .shell { grid-template-columns: 1fr; }
+    .rail { display: none; }
+    .article { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    body { font-size: 17.5px; }
+    .site-head__inner { width: min(1120px, 100% - 40px); }
+    .nav { gap: 18px; }
+    .nav a:not(.nav__contact):not([aria-current="page"]) { display: none; }
+    .brand__name { display: none; }
+    .shell { width: min(1080px, 100% - 40px); padding-top: 38px; }
+    h1 { font-size: clamp(2.15rem, 8vw, 2.7rem); }
+    .subtitle { font-size: 1.16rem; }
+    .fig__scroll svg { min-width: 680px; }
+    .fig__hint { display: block; }
+    .compare { grid-template-columns: 1fr; }
+    .roles { grid-template-columns: 1fr; }
+    .role + .role { border-left: 0; border-top: 1px solid var(--line); padding-left: 0; }
+    .ladder li { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; }
+    .site-foot { width: min(1080px, 100% - 40px); }
+  }
+  @media (max-width: 480px) {
+    .meta span + span::before { margin: 0 6px; }
+    .bubble { font-size: 12px; }
+    .phone__record { font-size: 7.5px; }
+    .badge { font-size: 7px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  }
+  @media print {
+    body::after, .site-head, .theme, .progress, .rail, .skip, .post-ridge { display: none !important; }
+    body { background: #fff; color: #000; font-size: 11pt; }
+    .shell { display: block; width: auto; padding: 0; }
+    .article { max-width: none; }
+    .article a { color: #000; }
+    .fig { break-inside: avoid; }
+    h2 { break-after: avoid; }
+  }
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
+<div class="progress" aria-hidden="true"><span></span></div>
+
+<header class="site-head">
+  <div class="site-head__inner">
+    <a class="brand" href="/" aria-label="Abhishek Ash — home">
+      <span class="brand__mark" aria-hidden="true">AA</span>
+      <span class="brand__name">Abhishek Ash</span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="/#work">Work</a>
+      <a href="/#life">Life</a>
+      <a href="/blog/" aria-current="page">Blog</a>
+      <a href="/#about">About</a>
+      <a class="nav__contact" href="/#contact">Contact</a>
+    </nav>
+    <button class="theme" type="button" aria-pressed="false" aria-label="Switch to dark theme">
+      <svg class="theme__moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      <svg class="theme__sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="main" class="shell">
+  <nav class="rail" aria-label="Contents">
+    <p class="rail__label">Contents</p>
+    <ol>
+      <li><a href="#the-missing-state">The missing state</a></li>
+      <li><a href="#what-counts-as-the-same-operation">What counts as the same operation?</a></li>
+      <li><a href="#how-much-should-the-model-decide">How much should the model decide?</a></li>
+      <li><a href="#what-does-the-receipt-prove">What does the receipt prove?</a></li>
+      <li><a href="#building-the-first-version">Building the first version</a></li>
+    </ol>
+    <a class="rail__back" href="/blog/">← All writing</a>
+  </nav>
+
+  <article class="article">
+<p class="kicker">Software design · AI agents</p>
+<h1>Agents Don&#x27;t Fail Loudly</h1>
+<p class="subtitle">Designing for the gap between an action and what the agent knows about it</p>
+<p class="meta"><span>October 2026</span><span>9 min read</span><span>1,849 words</span></p>
+<div class="post-ridge" aria-hidden="true">
+  <svg viewBox="0 0 760 70" preserveAspectRatio="none">
+    <path d="M0 70 L0 52 L72 44 L132 28 L192 40 L252 18 L312 34 L372 12 L432 30 L502 22 L572 38 L642 30 L702 46 L760 40" fill="none" stroke="currentColor" stroke-width="1.1"/>
+    <path d="M0 70 L0 62 L82 58 L152 52 L222 58 L292 46 L362 54 L432 44 L502 52 L572 46 L642 56 L712 52 L760 58" fill="none" stroke="currentColor" stroke-width=".7" opacity=".5"/>
+  </svg>
+</div>
+<p class="lede">Suppose a customer asks for a €40 refund. An agent finds the payment, checks the policy, and calls the refund API. The request times out.</p>
+<p>There are now two possible worlds. In one, the payment service never received the request. In the other, it issued the refund and the response was lost. The agent has the same evidence in both worlds.</p>
+<p>If it retries carelessly, it may refund twice. If it gives up, it may leave the customer waiting for money that was never sent. If it says the refund succeeded, it may be inventing a financial event. A fluent explanation is available in every case.</p>
+
+<figure class="fig fig--phone">
+  <div class="phone" role="group" aria-label="Example support conversation">
+    <div class="phone__screen">
+      <div class="phone__bar"><span>09:41</span><span>support</span><span>•••</span></div>
+      <div class="phone__chat">
+        <p class="bubble bubble--them">Hi — I think I was charged twice for order #4821. Can you refund the extra €40?</p>
+        <p class="bubble bubble--agent">I've checked the payment and issued a €40 refund. It should arrive in 3–5 working days.</p>
+        <p class="bubble bubble--them">Thanks!</p>
+      </div>
+      <div class="phone__record">
+        <span>refund · op_8f21</span>
+        <span class="badge">outcome unknown</span>
+      </div>
+    </div>
+  </div>
+  <figcaption><span class="fig__num">Figure 1.</span> The customer sees a fluent answer. The operation record still says the outcome is unknown. Both can be true at once.</figcaption>
+</figure>
+<p>This is a useful place to begin thinking about production agents. The model may have understood the customer perfectly. It may have chosen the right tool with the right arguments. We still need a design for what happens next.</p>
+<p>The attraction of an agent is that it can work out how to do something we have described loosely. That flexibility also makes it easy to leave parts of the system undesigned. We give it a goal, some tools, and permission to continue until it believes it has finished. Then we discover that “finished” contains several decisions we never made.</p>
+<p>The refund example is hypothetical. It is small enough to examine without appealing to anyone&#x27;s production war stories, and it exposes three questions worth answering for any agent that can change something: what happened, what was allowed to happen, and what evidence would let us tell the difference?</p>
+
+<figure class="fig">
+  <div class="fig__scroll" tabindex="0" role="group" aria-label="Diagram: one timeout, two possible worlds. Scroll horizontally on small screens.">
+  <svg class="diagram" viewBox="0 0 760 320" role="img" aria-labelledby="fig-worlds-title">
+    <title id="fig-worlds-title">One timeout, two possible worlds: the request never arrived, or the refund happened and the response was lost.</title>
+    <defs>
+      <marker id="aw-worlds" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" class="arrowhead"/>
+      </marker>
+    </defs>
+    <line x1="330" y1="14" x2="330" y2="306" class="line dash muted"/>
+    <text x="338" y="20" class="t-mono t-muted">PROVIDER BOUNDARY</text>
+
+    <rect x="20" y="112" width="160" height="76" rx="6" class="box"/>
+    <text x="36" y="136" class="t-strong">Refund €40</text>
+    <text x="36" y="154" class="t-mono t-muted">op_8f21</text>
+    <text x="36" y="170" class="t-mono t-muted">payment py_42</text>
+
+    <line x1="180" y1="150" x2="274" y2="150" class="line" marker-end="url(#aw-worlds)"/>
+
+    <circle cx="330" cy="150" r="40" class="line dash accent"/>
+    <text x="330" y="146" text-anchor="middle" class="t-strong">timeout</text>
+    <text x="330" y="163" text-anchor="middle" class="t-mono t-muted">no response</text>
+
+    <path d="M370 150 H410 Q430 150 430 128 V84 H468" class="line" marker-end="url(#aw-worlds)"/>
+    <path d="M370 150 H410 Q430 150 430 172 V226 H468" class="line" marker-end="url(#aw-worlds)"/>
+
+    <rect x="470" y="42" width="270" height="84" rx="6" class="box"/>
+    <text x="486" y="64" class="t-mono t-muted">WORLD A</text>
+    <text x="486" y="84" class="t-strong">Request never arrived</text>
+    <text x="486" y="104" class="t-mono t-muted">ledger: unchanged</text>
+
+    <rect x="470" y="208" width="270" height="84" rx="6" class="box box--accent"/>
+    <text x="486" y="230" class="t-mono t-accent">WORLD B</text>
+    <text x="486" y="250" class="t-strong">Refund issued, response lost</text>
+    <text x="486" y="270" class="t-mono t-accent">ledger: −€40</text>
+
+    <text x="316" y="218" text-anchor="end" class="t-mono t-muted">same local evidence</text>
+  </svg>
+  </div>
+  <p class="fig__hint" aria-hidden="true">Scroll to explore →</p>
+  <figcaption><span class="fig__num">Figure 2.</span> A timeout is not an outcome. In one world no money moved; in the other it did. The agent's local record looks the same in both.</figcaption>
+</figure>
+<h2 id="the-missing-state">The missing state</h2>
+<p>A first implementation might record each tool call as either successful or failed. A timeout goes into the failed column, where a retry policy picks it up.</p>
+<p>That representation has already made a business decision. It has treated the absence of a response as evidence that no money moved.</p>
+<p>We need an <em>unknown</em> state. Once a request may have reached the payment service, the workflow must preserve the possibility that the refund exists. Recovery then involves finding out what happened.</p>
+
+<figure class="fig">
+  <div class="fig__scroll" tabindex="0" role="group" aria-label="Diagram: operation states from proposed to unknown. Scroll horizontally on small screens.">
+  <svg class="diagram" viewBox="0 0 760 380" role="img" aria-labelledby="fig-states-title">
+    <title id="fig-states-title">Operation states: proposed, authorised, dispatched, confirmed, unknown, escalated. A timeout moves a dispatched operation into unknown, not failed.</title>
+    <defs>
+      <marker id="aw-states" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 Z" class="arrowhead"/>
+      </marker>
+    </defs>
+
+    <rect x="20" y="44" width="140" height="58" rx="6" class="box"/>
+    <text x="36" y="66" class="t-mono t-muted">01</text>
+    <text x="36" y="86" class="t-strong">Proposed</text>
+
+    <rect x="210" y="44" width="150" height="58" rx="6" class="box"/>
+    <text x="226" y="66" class="t-mono t-muted">02</text>
+    <text x="226" y="86" class="t-strong">Authorised</text>
+
+    <rect x="410" y="44" width="140" height="58" rx="6" class="box"/>
+    <text x="426" y="66" class="t-mono t-muted">03</text>
+    <text x="426" y="86" class="t-strong">Dispatched</text>
+
+    <rect x="600" y="44" width="140" height="58" rx="6" class="box"/>
+    <text x="616" y="66" class="t-mono t-muted">04</text>
+    <text x="616" y="86" class="t-strong">Confirmed</text>
+
+    <rect x="410" y="230" width="140" height="72" rx="6" class="box box--accent"/>
+    <text x="426" y="252" class="t-mono t-accent">05</text>
+    <text x="426" y="274" class="t-strong">Unknown</text>
+    <text x="426" y="290" class="t-mono t-muted">owner + deadline</text>
+
+    <rect x="600" y="238" width="140" height="58" rx="6" class="box"/>
+    <text x="616" y="260" class="t-mono t-muted">06</text>
+    <text x="616" y="280" class="t-strong">Escalated</text>
+
+    <line x1="160" y1="73" x2="204" y2="73" class="line" marker-end="url(#aw-states)"/>
+    <text x="164" y="34" class="t-mono t-muted">policy + approval</text>
+
+    <line x1="360" y1="73" x2="404" y2="73" class="line" marker-end="url(#aw-states)"/>
+    <text x="364" y="34" class="t-mono t-muted">durable intent</text>
+
+    <line x1="550" y1="73" x2="594" y2="73" class="line" marker-end="url(#aw-states)"/>
+    <text x="554" y="34" class="t-mono t-muted">response</text>
+
+    <line x1="480" y1="102" x2="480" y2="224" class="line dash accent" marker-end="url(#aw-states)"/>
+    <text x="490" y="168" class="t-mono t-accent">timeout / crash</text>
+
+    <line x1="550" y1="266" x2="594" y2="266" class="line" marker-end="url(#aw-states)"/>
+    <text x="554" y="256" class="t-mono t-muted">deadline</text>
+
+    <path d="M540 230 C578 194 620 154 658 104" class="line dash" marker-end="url(#aw-states)"/>
+    <text x="612" y="192" class="t-mono t-muted">reconcile</text>
+
+    <text x="20" y="344" class="t-mono t-accent">UNKNOWN IS A STATE, NOT AN ERROR.</text>
+    <text x="740" y="344" text-anchor="end" class="t-mono t-muted">retry uses the same operation key</text>
+  </svg>
+  </div>
+  <p class="fig__hint" aria-hidden="true">Scroll to explore →</p>
+  <figcaption><span class="fig__num">Figure 3.</span> Unknown is a real state with an owner and an exit: reconciliation or escalation. Collapsing it into “failed” throws away the information needed to decide what to do next.</figcaption>
+</figure>
+<p>This requires a durable record of the operation before dispatch: the request identifier, payment identifier, amount, currency, and authorisation that permitted it. After dispatch, record the response or the fact that the outcome is uncertain. If the process crashes between those records, recovery should conservatively treat the operation as potentially dispatched.</p>
+<p>These are separate durable transitions. A transaction in our database cannot generally include the payment service&#x27;s remote action. Holding a database transaction open while making the call would still leave us with a possible refund and a rolled-back local record.</p>
+<p>An outbox can help with a particular part of this design. We can commit the authorised refund request and a message requesting its execution in one local transaction. A worker then delivers that message. This closes the gap where the request is recorded but the process dies before arranging delivery. The worker can still deliver twice, so the receiver must handle duplicates appropriately. <a href="https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/transactional-outbox.html">The transactional outbox pattern</a> solves a local coordination problem; the external effect still needs its own protection.</p>
+<p>The unknown state also needs a way to leave it. A background worker might query the provider using a recorded refund identifier or a supported operation reference. Some providers let us safely repeat the original request. Others offer too little information to resolve the ambiguity automatically.</p>
+<p>That last case needs an owner. Give unresolved operations a deadline for escalation and preserve the evidence a person will need. An entry in an unknown column is otherwise just a customer problem hidden in a database.</p>
+<h2 id="what-counts-as-the-same-operation">What counts as the same operation?</h2>
+<p>Idempotency gives us a way to repeat a request while limiting its effect. But it depends on our definition of “repeat.”</p>
+<p>Consider two requests to refund €40 against the same payment. They might be retries of one customer request. They might also be two separately authorised partial refunds. The payment identifier and amount cannot distinguish them.</p>
+
+<figure class="fig">
+  <div class="compare">
+    <div class="compare__col">
+      <p class="compare__label">Same operation key</p>
+      <div class="compare__keys">
+        <span class="key">op_8f21</span>
+        <span class="compare__arrow" aria-hidden="true">→</span>
+        <span class="key">op_8f21</span>
+      </div>
+      <p class="compare__result">one refund</p>
+      <p class="compare__note">The retry is the same instruction.</p>
+    </div>
+    <div class="compare__col compare__col--bad">
+      <p class="compare__label">Fresh key on retry</p>
+      <div class="compare__keys">
+        <span class="key">op_8f21</span>
+        <span class="compare__arrow" aria-hidden="true">→</span>
+        <span class="key key--new">op_9c02</span>
+      </div>
+      <p class="compare__result">two refunds</p>
+      <p class="compare__note">The retry becomes a new instruction.</p>
+    </div>
+  </div>
+  <figcaption><span class="fig__num">Figure 4.</span> The key belongs to the business operation, not to the attempt. If a retry can mint a new key, the model can turn one refund into two.</figcaption>
+</figure>
+<p>The identifier therefore belongs to the business operation. When the application accepts a new refund request, it creates an operation identifier and persists it. Every attempt to execute that request uses the same key. A second authorised refund receives a different one. The application also has to recognise duplicate submissions of the original request; creating a fresh operation whenever the customer clicks again would move the duplication problem upstream.</p>
+<p>The model should not invent a new key when it decides to try again. Generating fresh identifiers would allow each retry to look like a new instruction to move money.</p>
+<p>The provider&#x27;s contract matters here. For example, <a href="https://docs.stripe.com/api/idempotent_requests">Stripe documents</a> that API v1 requests using the same key return the stored result after execution begins, including stored errors. It also documents parameter checks and key retention limits. A retry policy has to respect those details. A key that has been forgotten by the receiver offers no protection against a much later replay.</p>
+<p>Where the provider cannot deduplicate requests, our local records alone cannot guarantee a single external effect. We may be able to reconcile against its ledger. We may have to stop and ask a person. Some actions have a compensating action, but compensation is another operation that can fail. Sending a correction email does not unsend the first email.</p>
+<p>This is why recovery behaviour belongs in the tool design. An agent should be able to distinguish an operation it can safely retry from one whose outcome it must investigate. Exposing a tool that returns a generic error throws away information the rest of the system needs.</p>
+<h2 id="how-much-should-the-model-decide">How much should the model decide?</h2>
+<p>The refund also helps locate the useful boundary for the model.</p>
+<p>Understanding a customer&#x27;s explanation may require interpretation. The customer might describe a duplicate charge indirectly, refer to an earlier conversation, or ask for an exception. A model can help turn that account into a proposed action.</p>
+<p>Other decisions are already specified. The authenticated account determines which payments the customer can access. The payment record determines the currency. The current refundable balance limits the amount. These facts should be enforced by the tool that executes the refund.</p>
+<p>A useful interface might let the model propose a payment identifier, an amount, and a reason. The server resolves those identifiers within the customer&#x27;s account, checks the amount against current state, and requires any necessary authorisation. The check must remain valid when the refund executes, including when another request is being processed concurrently.</p>
+<p>This makes it possible to improve the model without making it responsible for every invariant in the application. Better understanding can reduce mistaken proposals. Server-side controls restrict what even a mistaken proposal can do.</p>
+
+<figure class="fig">
+  <div class="roles">
+    <div class="role">
+      <span class="role__label">Model</span>
+      <p>Interpret the request. Propose a payment, an amount, a reason.</p>
+    </div>
+    <div class="role">
+      <span class="role__label">Server</span>
+      <p>Resolve the account. Enforce currency, balance, and authorisation at execution.</p>
+    </div>
+    <div class="role">
+      <span class="role__label">Human</span>
+      <p>Own exceptions, unresolved unknowns, and policy changes.</p>
+    </div>
+  </div>
+  <figcaption><span class="fig__num">Figure 5.</span> The model proposes; the server enforces; a person owns ambiguity. Moving a decision into the model should be a product decision, not a side effect.</figcaption>
+</figure>
+<p>It also makes human approval more useful. The reviewer can inspect a specific operation: this payment, this amount, this customer, this reason. If those values change after approval, the approval no longer applies. A broad instruction to “handle the customer&#x27;s issue” gives the reviewer much less to assess.</p>
+<p>There is still judgment in deciding which actions need review. The important thing is to make that a product decision with an explicit scope. We should be able to explain why an operation is permitted without relying on the model&#x27;s assurance that it seems sensible.</p>
+<h2 id="what-does-the-receipt-prove">What does the receipt prove?</h2>
+<p>Eventually the payment service returns a refund identifier. Can the agent now tell the customer that the money is back?</p>
+<p>That depends on what the response means. The provider may have accepted the request while the refund remains pending. A receipt for acceptance supports a different statement from confirmation that processing has completed. The customer-facing language should follow the recorded status.</p>
+
+<figure class="fig">
+  <ol class="ladder">
+    <li>
+      <span class="ladder__chip">accepted</span>
+      <div>
+        <p><strong>Proves</strong> the provider received the request.</p>
+        <p>Does not prove the money moved.</p>
+      </div>
+    </li>
+    <li>
+      <span class="ladder__chip">pending</span>
+      <div>
+        <p><strong>Proves</strong> processing has started.</p>
+        <p>Does not prove it will complete, or when.</p>
+      </div>
+    </li>
+    <li>
+      <span class="ladder__chip">completed</span>
+      <div>
+        <p><strong>Proves</strong> the provider executed the refund.</p>
+        <p>Does not prove it hit the right payment, or resolved the complaint.</p>
+      </div>
+    </li>
+    <li>
+      <span class="ladder__chip">resolved</span>
+      <div>
+        <p><strong>Proves</strong> the customer's issue was addressed.</p>
+        <p>A product judgement, not a provider status — and it needs evidence beyond a closed ticket.</p>
+      </div>
+    </li>
+  </ol>
+  <figcaption><span class="fig__num">Figure 6.</span> Each word answers a narrower question than the sentence we want to say. “Completed” is not “the customer is whole.”</figcaption>
+</figure>
+<p>Even a completed refund proves only part of what we care about. The system may have refunded the wrong payment. The customer may have wanted a replacement. The amount may satisfy a policy while leaving the underlying complaint unresolved.</p>
+<p>There are several checks here. We can check that a request was authorised, that the provider executed it, and that the result matches the intended payment and amount. Assessing whether the response was appropriate to the customer&#x27;s situation may require a separate review of the conversation.</p>
+<p>A second model can help with that review, but agreement between two models is still something to evaluate. Give the reviewer examples with known mistakes: the right amount on the wrong payment, a pending refund described as completed, an exception granted without approval. Measure which mistakes it misses. Its usefulness depends on those results.</p>
+<p>Protect the evidence as well. A checking process offers little independence if the agent can edit its inputs or replace its implementation. Conversely, the agent can know the refund policy without gaining permission to alter the ledger against which its work is checked. The relevant boundary is what it can change.</p>
+<p>At the product level, the same care is needed with metrics. Closing a support ticket is easy to observe, but a customer can remain unhappy after closure. If closure becomes the main success measure, inspect reopened tickets and unresolved complaints too. The refund record and the conversation answer different questions, and both belong in an evaluation of whether the work was good.</p>
+<h2 id="building-the-first-version">Building the first version</h2>
+<p>I would start this system with a smaller task than “resolve refund requests.”</p>
+<p>The first version could identify the payment, explain the applicable policy, and prepare a refund for approval. It would still be useful. It would also let us observe where interpretation fails before giving the model authority to execute every proposal.</p>
+<p>The recovery path can be tested separately. Make the payment service accept a request and then drop the response. Kill the worker after dispatch but before it records the result. Submit the same customer request twice. Try two legitimate partial refunds with equal amounts. Resume an operation after the provider&#x27;s deduplication window has expired.</p>
+<p>Each test should have an expected business outcome. For the lost response, the system should eventually establish whether the original refund occurred, using reconciliation or a retry permitted by the provider&#x27;s contract. If it cannot, it should preserve the uncertainty and escalate. A test that merely checks whether the worker exited successfully would miss the problem we set out to solve.</p>
+<p>These tests do not require an autonomous agent. That is useful: we can establish the behaviour of the execution machinery while evaluating the model&#x27;s interpretation separately. Combining them later still needs testing, but a failure will be easier to locate.</p>
+<p>Once we understand those results, we can expand the cases allowed to execute without review. The decision would be based on observed errors and the cost of a mistaken action. More autonomy would then correspond to a specific set of cases we understand well enough to permit.</p>
+<p>An agent can make an application useful in situations its original programmers did not enumerate. The surrounding application still has to account for the actions it permits. If a customer asks where their €40 went, someone needs to be able to answer from a record of what happened.</p>
+
+    <div class="colophon">
+      <span>A design essay using a hypothetical example.</span>
+      <span><a href="/blog/">← Back to writing</a> · <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fabhishekash.github.io%2Fblog%2Fagents-dont-fail-loudly.html">Share on LinkedIn</a></span>
+    </div>
+  </article>
+</main>
+
+<footer class="site-foot">
+  <p>© 2026 Abhishek Ash</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Writing</a> · <a href="/blog/feed.xml">RSS</a></p>
+  <a href="#top">Back to top ↑</a>
+</footer>
+
+<script>
+(function () {
+  var root = document.documentElement;
+  var btn = document.querySelector(".theme");
+  var media = window.matchMedia("(prefers-color-scheme: dark)");
+  function isDark() { return root.dataset.theme ? root.dataset.theme === "dark" : media.matches; }
+  function label() {
+    if (!btn) return;
+    var dark = isDark();
+    btn.setAttribute("aria-pressed", String(dark));
+    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    btn.title = dark ? "Switch to light theme" : "Switch to dark theme";
+  }
+  if (btn) {
+    btn.addEventListener("click", function () {
+      root.dataset.theme = isDark() ? "light" : "dark";
+      try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+      label();
+    });
+    if (media.addEventListener) media.addEventListener("change", label);
+    label();
+  }
+
+  var bar = document.querySelector(".progress span");
+  function progress() {
+    if (!bar) return;
+    var max = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = "scaleX(" + (max > 0 ? Math.min(scrollY / max, 1) : 0) + ")";
+  }
+  addEventListener("scroll", progress, { passive: true });
+  addEventListener("resize", progress);
+  progress();
+
+  var links = Array.prototype.slice.call(document.querySelectorAll(".rail a[href^='#']"));
+  var sections = links.map(function (a) { return document.querySelector(a.getAttribute("href")); }).filter(Boolean);
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (a) {
+          a.classList.toggle("is-active", a.getAttribute("href") === "#" + entry.target.id);
+        });
+      });
+    }, { rootMargin: "-15% 0px -70% 0px" });
+    sections.forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Agents Don't Fail Loudly",
+  "description": "A hypothetical refund reveals how to design agent recovery, idempotency, authorisation, and verification.",
+  "datePublished": "2026-10-30",
+  "dateModified": "2026-10-30",
+  "author": { "@type": "Person", "name": "Abhishek Ash", "url": "https://abhishekash.github.io/" },
+  "publisher": { "@type": "Person", "name": "Abhishek Ash" },
+  "mainEntityOfPage": "https://abhishekash.github.io/blog/agents-dont-fail-loudly.html",
+  "image": "https://abhishekash.github.io/blog/og-agents-dont-fail-loudly.png",
+  "keywords": ["AI agents", "distributed systems", "idempotency", "human-in-the-loop", "reliability"]
+}
+</script>
+</body>
+</html>

@@ -6,6 +6,7 @@
 <title>Abhishek Ash — Engineer in Berlin</title>
 <meta name="description" content="Senior Staff Engineer in Berlin. Distributed systems, agentic architecture, open-source tools, and life outside the terminal.">
 <link rel="canonical" href="https://abhishekash.github.io/">
+<link rel="alternate" type="application/rss+xml" title="Abhishek Ash — Writing" href="https://abhishekash.github.io/blog/feed.xml">
 <meta name="author" content="Abhishek Ash">
 <meta name="theme-color" content="#F2EEE4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#14130F" media="(prefers-color-scheme: dark)">
@@ -104,6 +105,7 @@
   }
   body {
     margin: 0;
+    overflow-x: clip;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
@@ -120,6 +122,20 @@
     pointer-events: none;
     background: radial-gradient(820px 420px at 78% -8%, rgba(255, 189, 105, .16), transparent 70%);
     z-index: -1;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    pointer-events: none;
+    opacity: .5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+    background-size: 180px 180px;
+  }
+  :root[data-theme="dark"] body::after { opacity: .3; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) body::after { opacity: .3; }
   }
   ::selection { background: var(--mark); color: #17150F; }
   h1, h2, h3, p, ul, ol, dl, dd, figure { margin: 0; }
@@ -384,6 +400,129 @@
     color: var(--terminal-muted);
   }
 
+  /* ---------- paper, ranges, sketchbook ---------- */
+  .hero {
+    position: relative;
+    padding-bottom: clamp(150px, 15vw, 210px);
+  }
+  .hero__copy, .snapshot { position: relative; z-index: 1; }
+  .hero__horizon {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 100vw;
+    height: clamp(120px, 12vw, 170px);
+    transform: translateX(-50%);
+    color: var(--ink);
+    opacity: .24;
+    pointer-events: none;
+    z-index: 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 42%, #000 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 42%, #000 100%);
+  }
+  .sketchbook {
+    margin-top: clamp(48px, 6vw, 68px);
+    padding-top: 26px;
+    border-top: 1px solid var(--line-strong);
+  }
+  .sketchbook__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 6px 24px;
+  }
+  .sketchbook__label {
+    font: 500 10px/1 var(--mono);
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .sketchbook__note { font-size: 13.5px; color: var(--muted); }
+  .sketches {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 40px);
+    margin-top: 26px;
+  }
+  .sketch { margin: 0; }
+  .sketch svg { width: 100%; height: auto; color: var(--ink); opacity: .9; }
+  .sketch:nth-child(1) svg { transform: rotate(-.35deg); }
+  .sketch:nth-child(2) svg { transform: rotate(.3deg); }
+  .sketch figcaption {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 16px;
+    align-items: baseline;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+  }
+  .sketch__name {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.1;
+    letter-spacing: -.01em;
+  }
+  .sketch__place {
+    font: 400 9.5px/1.4 var(--mono);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: right;
+  }
+  .sketch__line { grid-column: 1 / -1; font-size: 13px; line-height: 1.5; color: var(--muted); }
+  .post-card {
+    display: block;
+    margin-top: 40px;
+    padding: clamp(24px, 3.4vw, 34px);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    text-decoration: none;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  .post-card:hover { background: var(--bg-2); border-color: var(--line-strong); }
+  .post-card__meta {
+    font: 500 10px/1 var(--mono);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .post-card h3 {
+    margin-top: 14px;
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: clamp(1.8rem, 3.2vw, 2.35rem);
+    line-height: 1.08;
+    letter-spacing: -.02em;
+  }
+  .post-card p {
+    margin-top: 10px;
+    max-width: 62ch;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .post-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+    font: 600 13px/1 var(--sans);
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 4px;
+  }
+  .post-card:hover .post-card__cta { color: var(--accent); border-color: var(--accent); }
+  .notes-label {
+    margin-top: 34px;
+    font: 500 10px/1 var(--mono);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
   /* ---------- section scaffolding ---------- */
   .section { margin-top: clamp(76px, 10vw, 124px); }
   .section-head { max-width: 760px; }
@@ -621,6 +760,22 @@
     height: 2px;
     background: linear-gradient(90deg, var(--amber), var(--lavender), transparent 85%);
   }
+  .contact__range {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 170px;
+    color: var(--terminal-ink);
+    opacity: .13;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .contact .kicker, .contact h2, .contact__body, .contact__actions, .contact__note {
+    position: relative;
+    z-index: 1;
+  }
   .contact .kicker { color: var(--terminal-muted); }
   .contact h2 {
     font-size: clamp(2.2rem, 5vw, 3.8rem);
@@ -694,6 +849,9 @@
     .project__desc { grid-column: 1; }
     .project__meta { display: none; }
     .project__arrow { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+    .hero__horizon { height: 110px; opacity: .18; }
+    .sketches { grid-template-columns: 1fr; gap: 32px; }
+    .sketch svg { transform: none !important; }
     .contact__wm { display: none; }
   }
   @media (max-width: 520px) {
@@ -714,7 +872,7 @@
   }
 
   @media print {
-    body::before, .site-head, .theme, .contact__wm, .skip { display: none !important; }
+    body::before, body::after, .hero__horizon, .contact__range, .site-head, .theme, .contact__wm, .skip { display: none !important; }
     body { background: #fff; color: #000; }
     .contact { background: #fff; color: #000; border-color: #999; }
     .contact__body, .contact__note { color: #333; }
@@ -734,7 +892,7 @@
     <nav class="nav" aria-label="Primary">
       <a href="#work">Work</a>
       <a href="#life">Life</a>
-      <a href="#notes">Notes</a>
+      <a href="/blog/">Blog</a>
       <a href="#about">About</a>
       <a class="nav__contact" href="#contact">Contact</a>
     </nav>
@@ -748,6 +906,36 @@
 <main id="main">
 
   <section class="hero wrap" aria-labelledby="hero-title">
+    <div class="hero__horizon" aria-hidden="true">
+      <svg viewBox="0 0 1440 180" preserveAspectRatio="none" width="100%" height="100%">
+        <defs>
+          <pattern id="horizonHatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(34)">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" stroke-width=".8"/>
+          </pattern>
+        </defs>
+        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M0 180 L0 136 L70 124 L142 100 L206 116 L274 82 L336 102 L398 66 L458 94 L520 120 L590 106 L660 78 L722 98 L790 60 L852 88 L914 72 L982 102 L1052 88 L1122 114 L1200 98 L1280 126 L1360 112 L1440 132 L1440 180" stroke-width="1.4"/>
+          <path d="M0 180 L0 158 L82 148 L154 132 L228 144 L300 120 L372 136 L440 112 L512 134 L584 148 L656 132 L728 116 L800 136 L872 120 L944 140 L1016 128 L1088 148 L1164 136 L1240 156 L1316 146 L1394 160 L1440 154 L1440 180" stroke-width=".9" opacity=".55"/>
+          <g fill="url(#horizonHatch)" stroke="none" opacity=".5">
+            <path d="M398 66 L458 94 L440 118 L412 100 Z"/>
+            <path d="M790 60 L852 88 L832 114 L802 94 Z"/>
+            <path d="M274 82 L336 102 L320 126 L292 108 Z"/>
+          </g>
+          <g stroke-width=".8" opacity=".6">
+            <path d="M398 66 L410 92 L426 106"/>
+            <path d="M790 60 L804 86 L822 100"/>
+            <path d="M982 102 L994 124 L1008 136"/>
+            <path d="M142 100 L154 122 L168 132"/>
+          </g>
+          <path d="M0 180 L0 168 C120 160 210 164 300 156 S520 150 640 158 S880 152 1020 160 S1300 156 1440 166 L1440 180" stroke-width=".8" opacity=".45"/>
+          <g stroke-width=".7" opacity=".4">
+            <path d="M620 42 q4 -4 8 0 q4 -4 8 0"/>
+            <path d="M660 32 q3 -3 6 0 q3 -3 6 0"/>
+            <path d="M1180 56 q3 -3 6 0 q3 -3 6 0"/>
+          </g>
+        </g>
+      </svg>
+    </div>
     <div class="hero__copy">
       <p class="eyebrow"><span class="dot" aria-hidden="true"></span>Senior Staff Engineer · Berlin</p>
       <h1 id="hero-title">I build systems that <em>explain themselves</em> — and small tools for the <span class="mark">people around me</span>.</h1>
@@ -850,15 +1038,225 @@
         <p>I like software with a narrow job: local-first, no account, no dashboard, no engagement loop. The best test is whether one person misses it when it's gone.</p>
       </div>
     </div>
+
+    <div class="sketchbook">
+      <div class="sketchbook__head">
+        <p class="sketchbook__label">From the sketchbook</p>
+        <p class="sketchbook__note">Two ranges I keep coming back to. Pencil, mostly from memory.</p>
+      </div>
+      <div class="sketches">
+
+        <figure class="sketch">
+          <svg viewBox="0 0 560 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="dawnG" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFBD69" stop-opacity=".16"/>
+                <stop offset=".55" stop-color="#FFBD69" stop-opacity=".03"/>
+                <stop offset="1" stop-color="#FFBD69" stop-opacity="0"/>
+              </linearGradient>
+              <pattern id="hatchG" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+                <line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" stroke-width=".7"/>
+              </pattern>
+              <filter id="roughG" x="-8%" y="-8%" width="116%" height="116%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="11" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+            </defs>
+            <rect width="560" height="340" fill="url(#dawnG)"/>
+            <g filter="url(#roughG)" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <g opacity=".26" stroke-width=".8">
+                <path d="M0 236 L46 221 L82 200 L120 210 L160 186 L196 197 L232 176 L270 188 L306 170 L342 184 L380 168 L418 186 L458 176 L500 196 L536 210 L560 220"/>
+              </g>
+              <g stroke-width="1.15">
+                <path id="gRidge" d="M18 258 L52 240 L86 212 L112 222 L140 188 L168 200 L196 170 L222 182 L250 142 L272 156 L292 104 L310 126 L328 82 L348 112 L368 100 L390 134 L416 122 L444 156 L472 168 L502 206 L530 222 L552 250"/>
+                <use href="#gRidge" x=".8" y=".5" opacity=".28"/>
+                <path d="M40 222 C78 214 104 204 132 208 S180 194 208 186 S258 172 286 166 S330 154 356 160 S404 152 436 168 S488 196 522 214" stroke-width=".8" opacity=".8"/>
+                <g fill="url(#hatchG)" stroke="none" opacity=".55">
+                  <path d="M328 82 L348 112 L368 100 L390 134 L372 152 L350 142 L338 118 Z"/>
+                  <path d="M292 104 L310 126 L300 152 L276 142 L272 156 Z"/>
+                  <path d="M390 134 L416 122 L444 156 L426 172 L406 152 Z"/>
+                  <path d="M222 182 L250 142 L262 158 L250 176 Z"/>
+                </g>
+                <g stroke-width=".8" opacity=".7">
+                  <path d="M310 126 L320 150 L336 166"/>
+                  <path d="M348 112 L354 136 L368 150"/>
+                  <path d="M292 104 L286 128 L276 142"/>
+                  <path d="M390 134 L400 150 L414 160"/>
+                  <path d="M140 188 L152 206 L166 214"/>
+                  <path d="M196 170 L204 190 L218 198"/>
+                </g>
+                <g stroke-width=".7" opacity=".55">
+                  <path d="M300 94 l3 1 M308 100 l3 -1 M316 108 l3 1 M326 96 l2 2 M334 120 l3 1 M344 126 l2 -1 M356 112 l3 1 M364 128 l2 1 M304 132 l2 1 M282 116 l2 1"/>
+                </g>
+              </g>
+              <g stroke-width="1">
+                <path d="M20 316 C70 300 108 276 158 264 S250 250 300 258 S382 274 426 286 S506 302 546 312"/>
+                <path d="M56 306 C96 292 130 274 170 268 S246 258 290 264 S360 278 400 288 S480 300 518 308" stroke-width=".8" opacity=".65"/>
+                <path d="M96 300 C116 288 132 280 150 278 S184 276 200 282" stroke-width=".8" opacity=".6"/>
+                <path d="M330 286 C352 278 372 278 390 282" stroke-width=".8" opacity=".55"/>
+              </g>
+              <g stroke-width=".9">
+                <path d="M214 292 C224 283 252 281 266 288 C256 297 228 299 214 292 Z"/>
+                <g opacity=".55" stroke-width=".7"><path d="M222 290 h18 M226 293 h12 M238 287 h14"/></g>
+              </g>
+              <g stroke-width="1">
+                <path d="M0 340 L0 318 C26 312 44 306 62 300 S96 294 114 300 S142 314 158 322 S178 334 190 340"/>
+                <path d="M12 336 C44 326 62 314 86 308 S124 300 142 306" stroke-width=".8" opacity=".6"/>
+                <path d="M24 334 C58 322 78 310 104 304 S146 294 172 284 S214 266 238 258" stroke-dasharray="3 5" stroke-width=".9" opacity=".8"/>
+              </g>
+              <g stroke-width="1" opacity=".9">
+                <circle cx="126" cy="292" r="2.4"/>
+                <path d="M126 294 L125 302 M125 302 L121 309 M125 302 L129 309 M126 296 L121 299 M126 297 L131 300 M131 300 L134 309"/>
+                <path d="M128 294 h3 v5 h-3 Z" fill="currentColor" stroke="none" opacity=".5"/>
+              </g>
+              <g stroke-width=".9" opacity=".85">
+                <path d="M36 332 L36 310 M36 318 L28 320 L36 311 L44 320 Z M36 311 L30 313 L36 305 L42 313 Z"/>
+                <path d="M56 334 L56 316 M56 323 L49 325 L56 317 L63 325 Z M56 317 L51 319 L56 312 L61 319 Z"/>
+                <path d="M74 332 L74 318 M74 324 L68 326 L74 319 L80 326 Z"/>
+              </g>
+              <g stroke-width=".8" opacity=".7">
+                <circle cx="430" cy="62" r="16"/>
+                <path d="M414 62 h-6 M452 62 h6 M430 46 v-6 M430 78 v6 M419 51 l-4 -4 M441 73 l4 4 M441 51 l4 -4 M419 73 l-4 4" opacity=".6"/>
+              </g>
+              <g stroke-width=".9" opacity=".55">
+                <path d="M392 42 q4 -4 8 0 q4 -4 8 0"/>
+                <path d="M410 32 q3 -3 6 0 q3 -3 6 0"/>
+                <path d="M380 54 q3 -3 6 0 q3 -3 6 0"/>
+              </g>
+              <g stroke="none" fill="currentColor">
+                <text x="392" y="96" font-family="ui-monospace, monospace" font-size="7.5" letter-spacing="1.1">KANCHENJUNGA</text>
+                <path d="M388 92 L340 78" stroke="currentColor" stroke-width=".7"/>
+              </g>
+              <g stroke-width=".8" opacity=".6">
+                <circle cx="32" cy="36" r="9"/>
+                <path d="M32 29 L35 39 L32 37 L29 39 Z"/>
+                <text x="29" y="24" font-family="ui-monospace, monospace" font-size="7" fill="currentColor" stroke="none">N</text>
+              </g>
+            </g>
+          </svg>
+          <figcaption>
+            <span class="sketch__name">Goechala</span>
+            <span class="sketch__place">Sikkim · 4,600 m</span>
+            <span class="sketch__line">Kanchenjunga from the pass, first light</span>
+          </figcaption>
+        </figure>
+
+        <figure class="sketch">
+          <svg viewBox="0 0 560 340" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="dawnA" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFBD69" stop-opacity=".16"/>
+                <stop offset=".55" stop-color="#FFBD69" stop-opacity=".03"/>
+                <stop offset="1" stop-color="#FFBD69" stop-opacity="0"/>
+              </linearGradient>
+              <pattern id="hatchA" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+                <line x1="0" y1="0" x2="0" y2="5" stroke="currentColor" stroke-width=".7"/>
+              </pattern>
+              <filter id="roughA" x="-8%" y="-8%" width="116%" height="116%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="23" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="1.8" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+            </defs>
+            <rect width="560" height="340" fill="url(#dawnA)"/>
+            <g filter="url(#roughA)" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <g opacity=".24" stroke-width=".8">
+                <path d="M0 230 L40 214 L82 196 L120 204 L158 180 L196 192 L236 172 L278 186 L320 174 L362 190 L404 180 L446 196 L492 190 L532 206 L560 218"/>
+              </g>
+              <g stroke-width="1.15">
+                <path id="aRidge" d="M14 252 L48 226 L80 196 L108 208 L136 172 L162 186 L190 152 L214 166 L238 128 L258 146 L276 108 L292 138 L310 128 L330 72 L350 112 L370 132 L394 126 L418 158 L442 150 L462 178 L480 138 L492 98 L502 144 L512 104 L524 168 L548 198 L560 236"/>
+                <use href="#aRidge" x=".8" y=".5" opacity=".28"/>
+                <path d="M24 218 C64 208 92 198 118 204 S166 190 192 182 S240 170 266 164 S312 150 338 158 S386 150 414 166 S460 190 500 206" stroke-width=".8" opacity=".8"/>
+                <g fill="url(#hatchA)" stroke="none" opacity=".55">
+                  <path d="M330 72 L350 112 L370 132 L352 150 L334 132 L324 108 Z"/>
+                  <path d="M276 108 L292 138 L282 158 L262 146 L258 146 Z"/>
+                  <path d="M492 98 L502 144 L512 104 L524 168 L508 178 L496 140 Z"/>
+                  <path d="M190 152 L214 166 L206 184 L186 172 Z"/>
+                </g>
+                <g stroke-width=".8" opacity=".7">
+                  <path d="M330 72 L336 100 L350 118"/>
+                  <path d="M350 112 L358 136 L370 148"/>
+                  <path d="M276 108 L280 132 L292 148"/>
+                  <path d="M418 158 L428 176 L440 184"/>
+                  <path d="M136 172 L146 190 L160 198"/>
+                </g>
+                <g stroke-width=".7" opacity=".5">
+                  <path d="M336 86 l3 1 M344 96 l3 1 M352 108 l3 -1 M360 122 l2 1 M342 118 l2 1 M282 118 l2 1 M292 130 l2 1 M200 164 l2 1 M210 176 l2 1 M500 120 l2 1 M506 136 l2 1"/>
+                </g>
+              </g>
+              <g stroke-width="1">
+                <path d="M0 300 C50 288 90 278 132 282 S210 272 252 280 S330 270 376 280 S470 276 560 292"/>
+                <path d="M0 312 C54 300 96 292 138 296 S214 286 256 294 S336 284 382 294 S476 292 560 306" stroke-width=".9"/>
+                <path d="M0 324 C58 312 100 304 142 308 S218 300 260 308 S340 298 386 308 S480 306 560 320" stroke-width=".8" opacity=".8"/>
+                <g stroke-width=".7" opacity=".5">
+                  <path d="M44 300 v8 M88 292 v8 M128 294 v8 M180 286 v8 M224 288 v8 M272 286 v8 M322 284 v8 M370 288 v8 M420 290 v8 M470 292 v8 M516 296 v8"/>
+                </g>
+              </g>
+              <g stroke-width="1">
+                <path d="M382 292 h18 v12 h-18 Z M382 292 l9 -8 l9 8"/>
+                <path d="M406 288 h14 v14 h-14 Z M406 288 l7 -7 l7 7"/>
+                <path d="M424 294 h20 v10 h-20 Z M424 294 l10 -8 l10 8"/>
+                <g stroke-width=".7" opacity=".6">
+                  <path d="M387 298 h2 M393 298 h2 M410 294 h2 M416 294 h2 M430 299 h2 M437 299 h2"/>
+                </g>
+              </g>
+              <g stroke-width=".9" opacity=".8">
+                <path d="M54 302 c-9 -3 -12 -11 -6 -16 c-2 -8 8 -12 13 -8 c6 -5 14 1 11 8 c6 4 2 12 -5 12 c-2 4 -9 5 -13 4 Z M54 302 v12 M54 307 l-6 5 M54 307 l7 5"/>
+                <path d="M94 312 c-7 -2 -9 -9 -4 -12 c-1 -6 7 -9 10 -5 c5 -4 11 1 8 6 c5 3 2 9 -4 9 c-1 3 -7 4 -10 2 Z M94 312 v10 M94 316 l-5 4 M94 316 l5 4"/>
+              </g>
+              <g stroke-width="1">
+                <path d="M16 336 C60 328 90 318 120 312 S190 304 230 308 S300 302 340 306" stroke-dasharray="3 5" stroke-width=".9" opacity=".8"/>
+                <circle cx="246" cy="303" r="2.2"/>
+                <path d="M246 305 L245 311 M245 311 L242 317 M245 311 L248 317 M246 307 L242 309 M246 307 L250 309 M250 309 L252 316"/>
+              </g>
+              <g stroke-width=".8" opacity=".7">
+                <circle cx="470" cy="62" r="15"/>
+                <path d="M455 62 h-6 M485 62 h6 M470 47 v-6 M470 77 v6 M459 51 l-4 -4 M481 73 l4 4 M481 51 l4 -4 M459 73 l-4 4" opacity=".6"/>
+              </g>
+              <g stroke-width=".9" opacity=".5">
+                <path d="M400 40 q4 -4 8 0 q4 -4 8 0"/>
+                <path d="M424 30 q3 -3 6 0 q3 -3 6 0"/>
+                <path d="M386 54 q3 -3 6 0 q3 -3 6 0"/>
+              </g>
+              <g stroke="none" fill="currentColor">
+                <text x="360" y="60" font-family="ui-monospace, monospace" font-size="7.5" letter-spacing="1.1">ANNAPURNA I</text>
+                <path d="M356 56 L334 68" stroke="currentColor" stroke-width=".7"/>
+              </g>
+              <g stroke-width=".8" opacity=".6">
+                <circle cx="32" cy="36" r="9"/>
+                <path d="M32 29 L35 39 L32 37 L29 39 Z"/>
+                <text x="29" y="24" font-family="ui-monospace, monospace" font-size="7" fill="currentColor" stroke="none">N</text>
+              </g>
+            </g>
+          </svg>
+          <figcaption>
+            <span class="sketch__name">Annapurna</span>
+            <span class="sketch__place">Nepal · 8,091 m</span>
+            <span class="sketch__line">The massif at first light, with Machapuchare right</span>
+          </figcaption>
+        </figure>
+
+      </div>
+    </div>
   </section>
 
-  <section class="section wrap" id="notes" aria-labelledby="notes-title">
+  <section class="section wrap" id="writing" aria-labelledby="writing-title">
     <header class="section-head">
-      <p class="kicker">03 / Notes &amp; evidence</p>
-      <h2 id="notes-title">Show the work.</h2>
-      <p class="lede">A few things I've written down: engineering notes, an argument about quality, and the case for software built for one person.</p>
+      <p class="kicker">03 / Writing</p>
+      <h2 id="writing-title">Words, mostly about systems.</h2>
+      <p class="lede">Longer pieces on agent design, distributed systems, and the occasional personal build. The notes that don't fit in a commit message.</p>
     </header>
 
+    <a class="post-card" href="/blog/agents-dont-fail-loudly.html">
+      <span class="post-card__meta">Latest essay · October 2026 · 9 min read</span>
+      <h3>Agents Don't Fail Loudly</h3>
+      <p>Designing for the gap between an action and what the agent knows about it. A timeout is not an outcome — and a fluent answer is not evidence.</p>
+      <span class="post-card__cta">Read the essay
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg>
+      </span>
+    </a>
+    <p class="more"><a href="/blog/">All writing</a> · <a href="/blog/feed.xml">RSS</a></p>
+
+    <p class="notes-label">Elsewhere</p>
     <div class="notes">
       <a class="note-row" href="https://github.com/abhishekash/abhishekash/blob/main/docs/engineering-notes.md">
         <span class="note-row__num">01</span>
@@ -881,14 +1279,6 @@
         <div>
           <h3>The case for hyper-personal apps</h3>
           <p>When building for one person is cheaper than building for everyone, the product gets more honest.</p>
-        </div>
-        <span class="note-row__arrow" aria-hidden="true">↗</span>
-      </a>
-      <a class="note-row" href="https://github.com/abhishekash/agent-evals#debugging-story-a-shell-escape-becomes-a-traceable-regression">
-        <span class="note-row__num">04</span>
-        <div>
-          <h3>A shell escape becomes a traceable regression</h3>
-          <p>One blocked command, one missing error span, and the check that keeps it fixed.</p>
         </div>
         <span class="note-row__arrow" aria-hidden="true">↗</span>
       </a>
@@ -919,6 +1309,12 @@
 
   <section class="section wrap" id="contact" aria-labelledby="contact-title">
     <div class="contact">
+      <svg class="contact__range" viewBox="0 0 1100 200" preserveAspectRatio="none" aria-hidden="true">
+        <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M0 200 L0 164 L52 154 L94 130 L138 142 L184 112 L226 128 L270 98 L308 120 L350 88 L388 110 L430 74 L466 98 L504 120 L546 106 L592 138 L638 124 L686 152 L734 144 L780 168 L828 156 L876 176 L924 164 L974 184 L1022 174 L1078 192 L1100 200" stroke-width="1.3"/>
+          <path d="M0 200 L0 182 L58 174 L104 156 L148 166 L194 142 L238 156 L282 132 L324 150 L366 126 L406 144 L448 116 L486 136 L526 152 L568 140 L614 164 L660 154 L706 174 L752 166 L798 184 L844 176 L892 190 L940 182 L988 194 L1036 188 L1082 198 L1100 200" stroke-width=".8" opacity=".55"/>
+        </g>
+      </svg>
       <span class="contact__wm" aria-hidden="true">AA</span>
       <p class="kicker">05 / Contact</p>
       <h2 id="contact-title">Say hello.</h2>

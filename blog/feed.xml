@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Abhishek Ash — Writing</title>
+    <link>https://abhishekash.github.io/blog/</link>
+    <description>Essays on agent design, distributed systems, and small personal software.</description>
+    <language>en</language>
+    <lastBuildDate>Fri, 30 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <atom:link href="https://abhishekash.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Agents Don't Fail Loudly</title>
+      <link>https://abhishekash.github.io/blog/agents-dont-fail-loudly.html</link>
+      <guid isPermaLink="true">https://abhishekash.github.io/blog/agents-dont-fail-loudly.html</guid>
+      <pubDate>Fri, 30 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Designing for the gap between an action and what the agent knows about it. A timeout is not an outcome — and a fluent answer is not evidence.</description>
+    </item>
+  </channel>
+</rss>
