@@ -5,55 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Page not found — Abhishek Ash</title>
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23FF385C'/%3E%3Cpath d='M16 44 28 24l8 12 6-8 6 16' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<style>
-  :root {
-    --bg:#fff; --ink:#222; --muted:#6B6B6B; --line:#E6E6E6;
-    --coral:#E31C5F; --purple:#6E4AFF;
-    --sans:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --mono:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg:#121212; --ink:#F7F7F7; --muted:#B0B0B0; --line:#2E2E2E; --coral:#FF5A5F; --purple:#A78BFA; }
-  }
-  * { box-sizing:border-box; }
-  html,body { height:100%; }
-  body {
-    margin:0; display:grid; place-items:center; padding:24px;
-    background:var(--bg); color:var(--ink); font-family:var(--sans); text-align:center;
-  }
-  main { width:min(520px,100%); }
-  .mark {
-    width:54px; height:54px; border-radius:50%; background:var(--coral);
-    display:grid; place-items:center; margin:0 auto 28px; color:#fff;
-  }
-  .mark svg { width:28px; height:28px; }
-  .kicker {
-    display:inline-flex; align-items:center; gap:8px; margin-bottom:14px;
-    font:600 10px/1 var(--mono); letter-spacing:.14em; text-transform:uppercase; color:var(--purple);
-  }
-  .kicker::before { content:""; width:8px; height:8px; border-radius:2px; background:var(--purple); }
-  h1 { margin:0; font-size:clamp(2.2rem,7vw,3.2rem); font-weight:700; line-height:1.05; letter-spacing:-.04em; }
-  p { margin:16px auto 0; max-width:40ch; color:var(--muted); font-size:16px; line-height:1.6; }
-  .btn {
-    display:inline-flex; align-items:center; justify-content:center;
-    height:48px; padding:0 22px; margin-top:28px; border-radius:999px;
-    background:var(--coral); color:#fff; font:600 15px/1 var(--sans);
-    text-decoration:none; box-shadow:0 6px 16px rgba(255,56,92,.24);
-  }
-  .btn:hover { filter:brightness(.94); }
-  :focus-visible { outline:2px solid var(--purple); outline-offset:3px; border-radius:4px; }
-</style>
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191d1b" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2335634b'/%3E%3Cpath d='M16 44 28 24l8 12 6-8 6 16' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/site.css">
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem("theme");
+    if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+  } catch (e) {}
+})();
+</script>
 </head>
-<body>
-<main>
-  <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 9 6l4 7 2.5-4L21 18"/></svg></div>
-  <p class="kicker">404 · Off the map</p>
-  <h1>This path doesn't go anywhere.</h1>
-  <p>The link may be old, or the page may have moved. The trail starts again at home.</p>
-  <a class="btn" href="/">Back to abhishekash.github.io →</a>
-</main>
+<body id="top">
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="/" aria-label="Abhishek Ash — home"><span aria-hidden="true">a.</span>Abhishek Ash</a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/blog/">Writing</a><a href="/#projects">Open source</a><a href="/#work">Work</a><a href="/#about">About</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none"/></svg>
+    </button>
+  </div>
+</header><main class="shell not-found" id="main"><p class="eyebrow">404 / Page not found</p><h1>This page has moved<br>or doesn’t exist.</h1><p>You can find my writing, open-source projects, and current work from the homepage.</p><div class="intro-links"><a href="/">Back to the homepage →</a><a href="/blog/">Browse the writing →</a></div></main><footer class="site-footer"><div class="shell footer-inner">
+  <span>© 2026 Abhishek Ash · Berlin</span>
+  <nav class="footer-links" aria-label="Elsewhere"><a href="https://github.com/abhishekash">GitHub</a><a href="https://www.linkedin.com/in/abhishekash/">LinkedIn</a><a href="/blog/feed.xml">RSS</a><a href="#top">↑ Top</a></nav>
+</div></footer>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>

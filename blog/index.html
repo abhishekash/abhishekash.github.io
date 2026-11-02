@@ -7,15 +7,15 @@
 <meta name="description" content="Essays by Abhishek Ash on agent design, distributed systems, and small personal software.">
 <link rel="canonical" href="https://abhishekash.github.io/blog/">
 <link rel="alternate" type="application/rss+xml" title="Abhishek Ash — Writing" href="https://abhishekash.github.io/blog/feed.xml">
-<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#faf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#191d1b" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Writing — Abhishek Ash">
 <meta property="og:description" content="Essays on agent design, distributed systems, and small personal software.">
 <meta property="og:url" content="https://abhishekash.github.io/blog/">
 <meta property="og:image" content="https://abhishekash.github.io/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23FF385C'/%3E%3Cpath d='M16 44 28 24l8 12 6-8 6 16' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2335634b'/%3E%3Cpath d='M16 44 28 24l8 12 6-8 6 16' fill='none' stroke='white' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <script>
 (function () {
   try {
@@ -24,356 +24,39 @@
   } catch (e) {}
 })();
 </script>
-<style>
-  :root {
-    color-scheme: light;
-    --bg: #FFFFFF; --bg-2: #F7F7F7; --bg-3: #F0F0F0;
-    --ink: #222222; --muted: #6B6B6B; --line: #E6E6E6; --line-soft: #EFEFEF; --line-strong: #D0D0D0;
-    --coral: #E31C5F; --coral-dark: #C9184A; --coral-btn: #E31C5F; --coral-btn-hover: #C9184A; --coral-soft: #FFF0F3;
-    --purple: #6E4AFF; --purple-soft: #F3EFFF;
-    --blue: #1ABCFE; --blue-soft: #E8F8FF;
-    --green: #0ACF83; --green-soft: #E9FBF3;
-    --orange: #FF7262; --orange-soft: #FFF0ED;
-    --radius: 16px; --radius-lg: 24px; --pill: 999px;
-    --shadow: 0 6px 16px rgba(0, 0, 0, .08);
-    --shadow-hover: 0 14px 32px rgba(0, 0, 0, .13);
-    --sans: "Airbnb Cereal VF", Circular, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  }
-  :root[data-theme="dark"] {
-    color-scheme: dark;
-    --bg: #121212; --bg-2: #1B1B1B; --bg-3: #262626;
-    --ink: #F7F7F7; --muted: #B0B0B0; --line: #2E2E2E; --line-soft: #262626; --line-strong: #444;
-    --coral: #FF5A5F; --coral-dark: #FF8A8F; --coral-btn: #E31C5F; --coral-btn-hover: #C9184A; --coral-soft: #2A1519;
-    --purple: #A78BFA; --purple-soft: #1F1A2E;
-    --blue: #56CCF2; --blue-soft: #12232B;
-    --green: #34D399; --green-soft: #12241D;
-    --orange: #FF8A75; --orange-soft: #2A1915;
-    --shadow: 0 6px 16px rgba(0, 0, 0, .4);
-    --shadow-hover: 0 14px 32px rgba(0, 0, 0, .55);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      color-scheme: dark;
-      --bg: #121212; --bg-2: #1B1B1B; --bg-3: #262626;
-      --ink: #F7F7F7; --muted: #B0B0B0; --line: #2E2E2E; --line-soft: #262626; --line-strong: #444;
-      --coral: #FF5A5F; --coral-dark: #FF8A8F; --coral-btn: #E31C5F; --coral-btn-hover: #C9184A; --coral-soft: #2A1519;
-      --purple: #A78BFA; --purple-soft: #1F1A2E;
-      --blue: #56CCF2; --blue-soft: #12232B;
-      --green: #34D399; --green-soft: #12241D;
-      --orange: #FF8A75; --orange-soft: #2A1915;
-      --shadow: 0 6px 16px rgba(0, 0, 0, .4);
-      --shadow-hover: 0 14px 32px rgba(0, 0, 0, .55);
-    }
-  }
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: 96px; -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font-family: var(--sans); font-size: 16.5px; line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-  }
-  h1, h2, h3, p, ul, ol { margin: 0; }
-  a { color: inherit; }
-  svg { display: block; }
-  ::selection { background: #FFD6DF; color: #222; }
-  :focus-visible { outline: 2px solid var(--purple); outline-offset: 3px; border-radius: 4px; }
-  .wrap { width: min(1280px, 100% - 64px); margin-inline: auto; }
-  .skip { position: absolute; left: 16px; top: -60px; z-index: 200; padding: 10px 16px; background: var(--ink); color: var(--bg); font: 600 13px/1 var(--sans); text-decoration: none; border-radius: var(--pill); }
-  .skip:focus { top: 12px; }
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-
-  .site-head { position: sticky; top: 0; z-index: 50; background: var(--bg); background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line-soft); }
-  .head-inner { width: min(1280px, 100% - 64px); margin-inline: auto; height: 80px; display: flex; align-items: center; gap: 20px; }
-  .brand { display: inline-flex; align-items: center; gap: 11px; text-decoration: none; font-weight: 700; font-size: 18px; letter-spacing: -.03em; }
-  .brand__mark { width: 36px; height: 36px; border-radius: 50%; background: var(--coral); display: grid; place-items: center; color: #fff; flex: none; }
-  .brand__mark svg { width: 20px; height: 20px; }
-  .nav { display: flex; align-items: center; gap: 2px; margin-left: auto; }
-  .nav a { padding: 10px 14px; border-radius: var(--pill); font-size: 14px; font-weight: 600; color: var(--muted); text-decoration: none; }
-  .nav a:hover { background: var(--bg-2); color: var(--ink); }
-  .nav a[aria-current="page"] { color: var(--ink); background: var(--bg-2); }
-  .head-actions { display: flex; align-items: center; gap: 10px; }
-  .theme { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 1px solid var(--line); border-radius: 50%; background: var(--bg); color: var(--ink); cursor: pointer; }
-  .theme:hover { background: var(--bg-2); }
-  .theme__sun { display: none; }
-  :root[data-theme="dark"] .theme__sun { display: block; }
-  :root[data-theme="dark"] .theme__moon { display: none; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .theme__sun { display: block; }
-    :root:not([data-theme="light"]) .theme__moon { display: none; }
-  }
-  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: var(--pill); border: 1px solid transparent; font: 600 15px/1 var(--sans); text-decoration: none; cursor: pointer; transition: background .15s ease, box-shadow .15s ease, transform .15s ease; }
-  .btn:hover { transform: translateY(-1px); }
-  .btn--primary { background: var(--coral-btn); color: #fff; box-shadow: 0 6px 16px rgba(255, 56, 92, .24); }
-  .btn--primary:hover { background: var(--coral-btn-hover); }
-  .btn--outline { border-color: var(--ink); color: var(--ink); background: var(--bg); }
-  .btn--outline:hover { background: var(--bg-2); }
-  .btn--sm { height: 40px; padding: 0 16px; font-size: 13.5px; }
-  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: var(--pill); background: var(--bg-2); color: var(--muted); font: 600 11px/1.3 var(--sans); }
-  .pill--coral { background: var(--coral-soft); color: var(--coral-dark); }
-  .pill--purple { background: var(--purple-soft); color: var(--purple); }
-  .pill--green { background: var(--green-soft); color: #067A4E; }
-  .pill--blue { background: var(--blue-soft); color: #0A6E93; }
-
-  /* blog hero */
-  .blog-hero { padding: clamp(48px, 7vw, 80px) 0 36px; }
-  .kicker { display: inline-flex; align-items: center; gap: 8px; font: 600 10.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--purple); margin-bottom: 14px; }
-  .kicker::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--purple); }
-  h1 { font-size: clamp(2.6rem, 5.6vw, 4.2rem); font-weight: 700; line-height: 1.04; letter-spacing: -.04em; text-wrap: balance; max-width: 18ch; }
-  .lede { margin-top: 18px; max-width: 58ch; color: var(--muted); font-size: 17px; line-height: 1.65; }
-
-  /* featured */
-  .feature { display: grid; grid-template-columns: 1.15fr .85fr; border: 1px solid var(--line); border-radius: var(--radius-lg); overflow: hidden; background: var(--bg); text-decoration: none; box-shadow: var(--shadow); transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease; }
-  .feature:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); border-color: var(--purple); }
-  .feature__body { padding: clamp(24px, 3.6vw, 38px); display: flex; flex-direction: column; align-items: flex-start; }
-  .feature__meta { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 16px; font: 500 10.5px/1.3 var(--mono); color: var(--muted); }
-  .feature h2 { margin-top: 14px; font-size: clamp(1.9rem, 3.4vw, 2.7rem); font-weight: 700; line-height: 1.06; letter-spacing: -.04em; }
-  .feature p { margin-top: 10px; max-width: 52ch; color: var(--muted); font-size: 15px; line-height: 1.6; }
-  .feature .btn { margin-top: 22px; }
-  .feature__media { position: relative; display: grid; place-items: center; padding: 24px; background: linear-gradient(145deg, #FFF1F3, #FFE1E8); overflow: hidden; }
-  :root[data-theme="dark"] .feature__media { background: linear-gradient(145deg, #2A1519, #351A24); }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .feature__media { background: linear-gradient(145deg, #2A1519, #351A24); }
-  }
-  .mini-phone { width: 220px; border-radius: 22px; background: #1B1B1F; padding: 7px; box-shadow: 0 14px 30px rgba(0, 0, 0, .2); transform: rotate(2deg); }
-  .mini-phone__screen { background: #fff; border-radius: 16px; overflow: hidden; }
-  .mini-phone__bar { display: flex; justify-content: space-between; padding: 7px 9px; border-bottom: 1px solid #EEE; font: 500 7px/1 var(--mono); color: #888; }
-  .mini-phone__chat { padding: 8px 8px 10px; display: grid; gap: 6px; }
-  .mini-bubble { max-width: 88%; padding: 7px 8px; border-radius: 9px; font: 400 9.5px/1.4 var(--sans); }
-  .mini-bubble--them { background: #F0F0F0; color: #222; border-bottom-left-radius: 2px; }
-  .mini-bubble--agent { background: #222; color: #fff; margin-left: auto; border-bottom-right-radius: 2px; }
-  .mini-phone__status { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 7px 9px; border-top: 1px dashed #DDD; font: 500 6.5px/1.2 var(--mono); color: #888; }
-  .mini-badge { border: 1px solid var(--coral); color: var(--coral); border-radius: 2px; padding: 2px 4px; font-size: 6px; text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
-
-  .section { margin-top: clamp(56px, 7vw, 88px); }
-  .section-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
-  h2 { font-size: clamp(1.7rem, 2.8vw, 2.2rem); font-weight: 700; line-height: 1.1; letter-spacing: -.035em; }
-  .section-lede { margin-top: 7px; color: var(--muted); font-size: 15px; max-width: 58ch; }
-  .elsewhere { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .link-card { display: flex; flex-direction: column; gap: 8px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); text-decoration: none; transition: box-shadow .18s ease, border-color .18s ease, transform .18s ease; }
-  .link-card:hover { box-shadow: var(--shadow); border-color: var(--purple); transform: translateY(-2px); }
-  .link-card__icon { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--purple-soft); color: var(--purple); }
-  .link-card:nth-child(2) .link-card__icon { background: var(--coral-soft); color: var(--coral); }
-  .link-card:nth-child(3) .link-card__icon { background: var(--green-soft); color: #067A4E; }
-  .link-card:nth-child(4) .link-card__icon { background: var(--blue-soft); color: #0A6E93; }
-  .link-card b { font-size: 14.5px; font-weight: 700; letter-spacing: -.01em; }
-  .link-card span { font-size: 13px; color: var(--muted); line-height: 1.5; }
-
-  .site-foot { margin-top: clamp(64px, 8vw, 96px); background: var(--bg-2); border-top: 1px solid var(--line); }
-  .foot-inner { width: min(1280px, 100% - 64px); margin-inline: auto; padding: 36px 0 24px; }
-  .foot-top { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
-  .foot-brand { max-width: 320px; }
-  .foot-brand .brand { font-size: 16px; }
-  .foot-brand p { margin-top: 10px; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
-  .foot-cols { display: flex; gap: clamp(32px, 6vw, 72px); flex-wrap: wrap; }
-  .foot-col { display: grid; gap: 7px; align-content: start; }
-  .foot-col b { font: 600 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-  .foot-col a { font-size: 13px; color: var(--ink); text-decoration: none; }
-  .foot-col a:hover { color: var(--coral); }
-  .foot-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 11.5px; color: var(--muted); }
-  .foot-bottom a { color: var(--ink); text-decoration: none; }
-
-  .mobile-nav { display: none; }
-  @media (max-width: 760px) {
-    .mobile-nav { display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 70; background: var(--bg); background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(14px); border-top: 1px solid var(--line); padding: 7px 6px calc(7px + env(safe-area-inset-bottom)); }
-    .mobile-nav a { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 3px 2px; font: 600 9.5px/1 var(--sans); color: var(--muted); text-decoration: none; }
-    .mobile-nav a[aria-current="page"] { color: var(--coral); }
-    .mobile-nav svg { width: 20px; height: 20px; }
-    body { padding-bottom: 66px; }
-  }
-
-  @media (max-width: 960px) {
-    .feature { grid-template-columns: 1fr; }
-    .feature__media { order: -1; min-height: 280px; }
-    .elsewhere { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 760px) {
-    .wrap, .head-inner, .foot-inner { width: min(1280px, 100% - 40px); }
-    .head-inner { height: 68px; }
-    .nav { display: none; }
-    .head-actions { margin-left: auto; }
-    .brand { font-size: 16px; }
-    .blog-hero { padding-top: 40px; }
-    .section-head { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .feature .btn { width: 100%; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
-    *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
-  }
-  @media print {
-    .site-head, .mobile-nav, .theme, .skip { display: none !important; }
-    body { background: #fff; color: #000; }
-  }
-</style>
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body id="top">
-<a class="skip" href="#main">Skip to content</a>
-
-<header class="site-head">
-  <div class="head-inner">
-    <a class="brand" href="/" aria-label="Abhishek Ash — home">
-      <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 9 6l4 7 2.5-4L21 18"/></svg></span>
-      <span>Abhishek Ash</span>
-    </a>
-    <nav class="nav" aria-label="Primary">
-      <a href="/#work">Work</a>
-      <a href="/#life">Life</a>
-      <a href="/blog/" aria-current="page">Writing</a>
-      <a href="/#about">About</a>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="/" aria-label="Abhishek Ash — home"><span aria-hidden="true">a.</span>Abhishek Ash</a>
+    <nav class="primary-nav" aria-label="Primary">
+      <a href="/blog/" aria-current="page">Writing</a><a href="/#projects">Open source</a><a href="/#work">Work</a><a href="/#about">About</a>
     </nav>
-    <div class="head-actions">
-      <button class="theme" type="button" aria-pressed="false" aria-label="Switch to dark theme">
-        <svg class="theme__moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
-        <svg class="theme__sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-      </button>
-      <a class="btn btn--outline btn--sm" href="/#contact">Contact</a>
-    </div>
+    <button class="theme-toggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none"/></svg>
+    </button>
   </div>
 </header>
-
-<main id="main">
-  <section class="blog-hero wrap" aria-labelledby="blog-title">
-    <p class="kicker">Writing · 01 essay</p>
-    <h1 id="blog-title">Essays, mostly about systems.</h1>
-    <p class="lede">Longer pieces on agent design, distributed systems, and the occasional personal build. No newsletter, no schedule — just what I finish.</p>
-  </section>
-
-  <section class="wrap" aria-labelledby="latest-title">
-    <a class="feature" href="/blog/agents-dont-fail-loudly.html">
-      <div class="feature__body">
-        <span class="pill pill--coral">Latest essay</span>
-        <h2 id="latest-title">Agents Don't Fail Loudly</h2>
-        <p>Designing for the gap between an action and what the agent knows about it. A timeout is not an outcome — and a fluent answer is not evidence.</p>
-        <div class="feature__meta"><span>October 2026</span><span>9 min read</span><span>Software design · AI agents</span></div>
-        <span class="btn btn--primary btn--sm">Read the essay</span>
-      </div>
-      <div class="feature__media" aria-hidden="true">
-        <div class="mini-phone">
-          <div class="mini-phone__screen">
-            <div class="mini-phone__bar"><span>09:41</span><span>support</span><span>•••</span></div>
-            <div class="mini-phone__chat">
-              <p class="mini-bubble mini-bubble--them">I was charged twice. Can you refund the extra €40?</p>
-              <p class="mini-bubble mini-bubble--agent">I've issued a €40 refund. It should arrive in 3–5 days.</p>
-            </div>
-            <div class="mini-phone__status"><span>refund · op_8f21</span><span class="mini-badge">outcome unknown</span></div>
-          </div>
-        </div>
-      </div>
-    </a>
-  </section>
-
-  <section class="section wrap" aria-labelledby="elsewhere-title">
-    <div class="section-head">
-      <div>
-        <h2 id="elsewhere-title">Elsewhere</h2>
-        <p class="section-lede">Shorter notes, and the working documents behind the projects.</p>
-      </div>
-    </div>
-    <div class="elsewhere">
-      <a class="link-card" href="https://github.com/abhishekash/abhishekash/blob/main/docs/engineering-notes.md">
-        <span class="link-card__icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11H4Z"/><path d="M15 4v5h5"/></svg></span>
-        <b>Engineering notes</b>
-        <span>Design decisions, evidence boundaries, and what is still unfinished.</span>
-      </a>
-      <a class="link-card" href="https://www.linkedin.com/posts/abhishekash_the-fallacy-of-sacrificing-quality-to-build-activity-7162430428891582464-0UeC">
-        <span class="link-card__icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg></span>
-        <b>Why quality metrics miss the point</b>
-        <span>Goodhart's law, systems thinking, and the limits of a metric wall.</span>
-      </a>
-      <a class="link-card" href="https://www.linkedin.com/posts/abhishekash_with-the-commoditization-of-ai-models-building-activity-7477636246845120513-cbI8">
-        <span class="link-card__icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg></span>
-        <b>The case for hyper-personal apps</b>
-        <span>Building for one person can make the product more honest.</span>
-      </a>
-      <a class="link-card" href="/blog/feed.xml">
-        <span class="link-card__icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1.6" fill="currentColor" stroke="none"/></svg></span>
-        <b>RSS feed</b>
-        <span>Follow new posts without an algorithm in the middle.</span>
-      </a>
-    </div>
-  </section>
-</main>
-
-<footer class="site-foot">
-  <div class="foot-inner">
-    <div class="foot-top">
-      <div class="foot-brand">
-        <a class="brand" href="/">
-          <span class="brand__mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18 9 6l4 7 2.5-4L21 18"/></svg></span>
-          <span>Abhishek Ash</span>
-        </a>
-        <p>Essays on systems, agents, and the occasional small tool built for one person.</p>
-      </div>
-      <div class="foot-cols">
-        <div class="foot-col">
-          <b>Explore</b>
-          <a href="/#work">Work</a>
-          <a href="/#life">Life</a>
-          <a href="/blog/">Writing</a>
-          <a href="/#about">About</a>
-        </div>
-        <div class="foot-col">
-          <b>Connect</b>
-          <a href="https://www.linkedin.com/in/abhishekash">LinkedIn ↗</a>
-          <a href="https://github.com/abhishekash">GitHub ↗</a>
-          <a href="/blog/feed.xml">RSS</a>
-        </div>
-      </div>
-    </div>
-    <div class="foot-bottom">
-      <span>© 2026 Abhishek Ash · Berlin</span>
-      <span>Single-file pages · no cookies, analytics, or third-party requests · <a href="#top">Back to top ↑</a></span>
-    </div>
+<main id="main" class="shell">
+  <header class="page-intro"><p class="eyebrow">Essays &amp; engineering notes</p><h1>Writing.</h1><p>Notes on distributed systems, agent architecture, and the decisions behind the software. Start with the essay below, or explore the shorter pieces and project notes.</p><div class="intro-links"><a href="/blog/feed.xml">Subscribe via RSS ↗</a><a href="/#projects">Explore the related tools →</a></div></header>
+  <section class="section blog-section" aria-labelledby="essay-title"><div class="section-heading"><h2 id="essay-title">Essays</h2></div>
+<article class="featured-essay">
+  <div><p class="entry-meta"><time datetime="2026-10-30">30 Oct 2026</time> · Essay · 9 min read</p>
+    <h3 class="entry-title"><a href="/blog/agents-dont-fail-loudly.html">Agents Don't Fail Loudly</a></h3>
+    <p class="entry-summary">An agent calls a refund API. The request times out. Did the refund happen? On unknown outcomes, idempotency, and designing systems that can answer that question.</p>
+    <a class="read-link" href="/blog/agents-dont-fail-loudly.html">Read the essay <span aria-hidden="true">→</span></a>
   </div>
-</footer>
-
-<nav class="mobile-nav" aria-label="Mobile">
-  <a href="/">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/></svg>
-    Home
-  </a>
-  <a href="/#work">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-    Work
-  </a>
-  <a href="/blog/" aria-current="page">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>
-    Writing
-  </a>
-  <a href="/#about">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.3 3.1-5.6 7-5.6s7 2.3 7 5.6"/></svg>
-    About
-  </a>
-  <a href="/#contact">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2.2-3.1A8 8 0 1 1 21 12Z"/></svg>
-    Contact
-  </a>
-</nav>
-
-<script>
-(function () {
-  var root = document.documentElement;
-  var btn = document.querySelector(".theme");
-  var media = window.matchMedia("(prefers-color-scheme: dark)");
-  function isDark() { return root.dataset.theme ? root.dataset.theme === "dark" : media.matches; }
-  function label() {
-    if (!btn) return;
-    var dark = isDark();
-    btn.setAttribute("aria-pressed", String(dark));
-    btn.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-    btn.title = dark ? "Switch to light theme" : "Switch to dark theme";
-  }
-  if (btn) {
-    btn.addEventListener("click", function () {
-      root.dataset.theme = isDark() ? "light" : "dark";
-      try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
-      label();
-    });
-    if (media.addEventListener) media.addEventListener("change", label);
-    label();
-  }
-})();
-</script>
+  <blockquote class="essay-quote">“A timeout is not an outcome.”</blockquote>
+</article></section>
+  <section class="section" aria-labelledby="notes-title"><div class="section-heading"><h2 id="notes-title">Notes &amp; elsewhere</h2></div><p class="section-intro">Shorter thoughts on LinkedIn and working notes alongside the code. The titles below describe the topics of the original posts.</p><ul class="writing-list"><li><a class="writing-row" href="https://www.linkedin.com/posts/abhishekash_the-fallacy-of-sacrificing-quality-to-build-activity-7162430428891582464-0UeC"><span class="entry-meta">LinkedIn · Note</span><div><h3>Why quality metrics miss the point</h3><p>Goodhart’s law, systems thinking, and the limits of a metric wall.</p></div><span class="external-arrow" aria-hidden="true">↗</span></a></li><li><a class="writing-row" href="https://www.linkedin.com/posts/abhishekash_with-the-commoditization-of-ai-models-building-activity-7477636246845120513-cbI8"><span class="entry-meta">LinkedIn · Note</span><div><h3>The case for hyper-personal apps</h3><p>What changes when you build software for one person.</p></div><span class="external-arrow" aria-hidden="true">↗</span></a></li><li><a class="writing-row" href="https://github.com/abhishekash/abhishekash/blob/main/docs/engineering-notes.md"><span class="entry-meta">GitHub · Notes</span><div><h3>Engineering notes from the agent tools</h3><p>Design decisions, evidence boundaries, and work in progress.</p></div><span class="external-arrow" aria-hidden="true">↗</span></a></li></ul></section>
+  <section class="contact" aria-label="About the author"><div><h2>Abhishek Ash</h2><p>Senior Staff Engineer at HelloFresh, based in Berlin. I build distributed systems and open-source tools for understanding AI agents.</p></div><a class="button-link" href="/">About &amp; projects →</a></section>
+</main>
+<footer class="site-footer"><div class="shell footer-inner">
+  <span>© 2026 Abhishek Ash · Berlin</span>
+  <nav class="footer-links" aria-label="Elsewhere"><a href="https://github.com/abhishekash">GitHub</a><a href="https://www.linkedin.com/in/abhishekash/">LinkedIn</a><a href="/blog/feed.xml">RSS</a><a href="#top">↑ Top</a></nav>
+</div></footer>
+<script src="/assets/site.js" defer></script>
 </body>
 </html>
