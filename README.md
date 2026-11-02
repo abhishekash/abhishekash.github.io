@@ -1,102 +1,76 @@
-# abhishekash.github.io
+# Abhishek Ash
 
-Personal site for **Abhishek Ash** — Senior Staff Engineer in Berlin. Work, open source,
-life outside the terminal, and writing.
+Personal site for Abhishek Ash, Senior Staff Engineer at HelloFresh in Berlin.
+Writing, professional focus, open source, and a little life outside work.
 
-Live at <https://abhishekash.github.io/>.
+Live site: <https://abhishekash.github.io/>.
 
 ## Design
 
-**Airbnb meets Figma.** The site uses Airbnb's clean, hospitable surface — white
-backgrounds, generous spacing, rounded cards, soft shadows, coral primary actions, and a
-mobile bottom navigation — with Figma's design-tool language: a dotted canvas, frame
-labels, purple selection handles, a cursor label, component-style chips, and a
-"Properties" inspector for the About section.
+A compact editorial layout: warm paper, forest-green links, serif headings, system
+fonts, fine rules, and a real portrait. The homepage puts the current role, selected
+writing, and working software before personal interests.
 
-- Palette: white `#FFFFFF`, ink `#222222`, muted `#6B6B6B`, coral `#E31C5F`, purple
-  `#6E4AFF`, with blue, green, and orange accents on the project tiles.
-- System sans typography, rounded 16–24px surfaces, pill buttons, and soft shadows.
-- The pencil Goechala and Annapurna studies remain, framed as rounded "art print" cards
-  in the Life section.
-- One self-contained HTML file per page: inline CSS and JS, system fonts, data-URI
-  favicon, no web fonts or third-party requests.
-- Light and dark themes follow `prefers-color-scheme`, with a persisted manual toggle.
-- Responsive from 320px, keyboard accessible, reduced-motion aware, and printable.
-- The mobile layout uses a fixed bottom tab bar with scroll-aware active states.
+See [the benchmark review](docs/site-review.md) for the comparison and remaining content gaps.
 
-## Contact
+- Identity → current role → selected writing → open source → personal interests → contact.
+- Projects link directly to demos, source, architecture decisions, or evaluation reports.
+- Agenturm uses an actual terminal screenshot labelled as synthetic demo records.
+- The essay and its six figures retain their original main markup and URL.
+- Light/dark themes follow the system preference with a persisted manual override.
+- Fonts, images, styles, and scripts are local. No analytics or third-party embeds.
+- Responsive CSS includes narrow-screen, reduced-motion, and print layouts.
+- Contact is LinkedIn only; no email address is published.
 
-LinkedIn only. No email address is published in the markup, JSON-LD, or commit metadata.
-
-## Structure
+## Files
 
 ```text
-index.html                              homepage
-404.html                                standalone not-found page
-og.png                                  1200×630 homepage social card
-blog/index.html                         writing index
-blog/agents-dont-fail-loudly.html       essay with six inline figures
-blog/og-agents-dont-fail-loudly.png     1200×630 essay social card
-blog/feed.xml                           RSS 2.0 feed
-sitemap.xml                             homepage, blog index, essay
-robots.txt                              allow all + sitemap
-.nojekyll                              skip Jekyll processing on GitHub Pages
+index.html                            homepage
+blog/index.html                       writing index
+blog/agents-dont-fail-loudly.html      original essay and six figures
+blog/feed.xml                         RSS feed (original publication date)
+404.html                              not-found page
+assets/site.css                       shared design and responsive layouts
+assets/article.css                    essay reading layout and diagrams
+assets/site.js                        theme toggle and article progress
+assets/portrait.png                   public GitHub portrait
+assets/agenturm-terminal.png          screenshot from the Agenturm repository
+og.png                                homepage social preview
+blog/og-agents-dont-fail-loudly.png    original essay social preview
+sitemap.xml                           published URLs
+.nojekyll                             serve static files directly
 ```
 
-## The essay
+## Preview and deploy
 
-**Agents Don't Fail Loudly** is a design essay built around a hypothetical refund. The
-figures are inline SVG / HTML and carry the argument:
+No build or dependencies are required:
 
-1. Support-chat phone mockup with an `outcome unknown` record.
-2. Two-world fork: request never arrived vs. refund issued, response lost.
-3. Operation state machine, including `Unknown` as a real state.
-4. Idempotency-key comparison: same key vs. fresh key on retry.
-5. Responsibility map: model, server, human.
-6. Receipt ladder: accepted, pending, completed, resolved.
-
-Wide diagrams become horizontally scrollable with a visible hint below 720px.
-
-## Content sources
-
-- <https://github.com/abhishekash/agenturm>
-- <https://github.com/abhishekash/spanhound>
-- <https://github.com/abhishekash/agent-harness>
-- <https://github.com/abhishekash/agent-evals>
-- <https://github.com/abhishekash/agent-skills>
-- <https://github.com/abhishekash/trekFinder>
-- <https://github.com/abhishekash/trek-ai>
-- <https://github.com/abhishekash/abhishekash>
-- LinkedIn posts linked from the Writing and Elsewhere sections
-- The essay source in `learnings/agents-dont-fail-loudly.md`
-
-The site avoids metrics and superlatives. Any technical claim is either linked to a
-repository or stated as an opinion.
-
-## Local preview
-
-```bash
+```sh
 python3 -m http.server 8000
-# open http://localhost:8000
 ```
 
-## Deploy
+Open <http://localhost:8000/>. GitHub Pages serves the repository root on `main`;
+merging a change into `main` publishes it through the existing Pages configuration.
 
-The repository is named `abhishekash.github.io`; GitHub Pages serves `main` from the
-repository root.
+## Editing
 
-```bash
-git add -A
-git commit -m "Update personal site"
-git push
-```
+Update the current role in `index.html`, the author summary in `blog/index.html`,
+and the homepage Person JSON-LD together. Headers/footers are plain HTML in each
+page; update all four when changing navigation.
 
-## Edit points
+When publishing an essay, add it to both writing lists, the RSS feed, and the sitemap.
+Only show dates and results supported by the source. Keep scripted regression
+results distinct from repeated live-model evaluation.
 
-- Hero copy and index card: `.hero` and `.snapshot` in `index.html`.
-- Current work and project list: `#work`.
-- Personal section and pencil studies: `#life` and `.sketchbook`.
-- Writing section: `#writing`.
-- Blog post list: `blog/index.html`.
-- Essay figures and article CSS: `blog/agents-dont-fail-loudly.html`.
-- Contact: `#contact` and the JSON-LD block at the end of the homepage.
+## Sources
+
+- Title confirmed by the owner; employer and focus retained from the existing public site.
+- [LinkedIn](https://www.linkedin.com/in/abhishekash/).
+- Verified public READMEs: [Agenturm](https://github.com/abhishekash/agenturm),
+  [SpanHound](https://github.com/abhishekash/spanhound),
+  [agent-harness](https://github.com/abhishekash/agent-harness),
+  [agent-evals](https://github.com/abhishekash/agent-evals), and
+  [agent-skills](https://github.com/abhishekash/agent-skills).
+- Portrait: the owner's public GitHub avatar, downloaded locally.
+- Terminal image: `media/agenturm-terminal.png` from Agenturm (MIT).
+- Original essay, LinkedIn links, and Himalayan illustrations retained.
